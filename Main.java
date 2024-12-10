@@ -15,13 +15,10 @@ public class Main{
 
 	public static void main(String[] args)
 	{
-		CSVtoMatrix("test.csv");
-
-			// Print the matrix
-/*		if (args.length > 0)
+		if (args.length > 0)
 			NonIterative(args);
 		else
-			Iterative(); */
+			Iterative();
 	}
 
 	public static void NonIterative(String[] arguments)
@@ -30,13 +27,32 @@ public class Main{
 
 	public static void Iterative()
 	{
-		int		type;
-		int		own_values;
-		String	path;
+		int			type;
+		int			own_values;
+		String		path;
+		CRSMatrix	matrix;
 
-		type = TypeOfExecution();
-		own_values = OwnValues();
-		path = FilePath();
+		type = 1;
+		while(type != 0)
+		{
+			type = TypeOfExecution();
+			if (type == 0)
+				break ;
+			own_values = OwnValues();
+			path = FilePath();
+			switch (type) {
+				case 1:
+					Decomposition();
+					break;
+				case 2:
+					Recomposition();
+					break;
+				case 3:
+					SearchClosest();
+					break;
+			}
+		}
+		System.out.println("Program ending... Thanks for using it!!");
 	}
 
 	//=========Prints & Scan=========//
@@ -54,7 +70,7 @@ public class Main{
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 		{
 			read = input.nextInt();
-			if (!(read <= 3 && read > 0))
+			if (!(read <= 3 && read >= 0))
 				System.out.println("You've entered a wrong value. Try it again: ");
 		}
 		return (read);
@@ -82,8 +98,8 @@ public class Main{
 	//=========Matrix Read=========//
 	public static CRSMatrix CSVtoMatrix(String filename)
 	{
-		String	all_csv;
-		double[][] csv;
+		double[][]	csv;
+		CRSMatrix	matrix;
 
 		csv = ReadingCsv(filename);
 		if(csv == null)
@@ -91,8 +107,8 @@ public class Main{
 			System.out.println("File does not exist!");
 			return (null);
 		}
-		CRSMatrix matrix = new CRSMatrix(csv.length, csv[0].length);
 
+		matrix = new CRSMatrix(csv.length, csv[0].length);
 		for (int i = 0; i < csv.length; i++) {
 			for (int j = 0; j < csv[i].length; j++) {
 				if (csv[i][j] != 0.0) {
@@ -132,7 +148,7 @@ public class Main{
 				noOfColumns = Csv.length;
 				toReturn = new double[noOfLines][noOfColumns];
 			}
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < noOfColumns; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 			j++;
 		}
