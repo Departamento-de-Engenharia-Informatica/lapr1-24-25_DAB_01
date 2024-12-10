@@ -64,7 +64,7 @@ public class Main{
 	{
 		int	read;
 
-		System.out.printf("Enter the own value(columns):\n");
+		System.out.printf("Enter the number of own values that you want to use(columns):\n");
 		read = input.nextInt();
 		input.nextLine();
 		return read;
@@ -79,6 +79,7 @@ public class Main{
 		return (path);
 	}
 
+	//=========Matrix Read=========//
 	public static CRSMatrix CSVtoMatrix(String filename)
 	{
 		String	all_csv;
@@ -108,8 +109,8 @@ public class Main{
 		Scanner		ReadFile;
 		String		regex = "[,]";
 		String[]	Csv;
-		double[][]	toReturn;
-		int			length;
+		double[][]	toReturn = null;
+		int			noOfColumns = 0;
 		int			noOfLines;
 		int			j;
 
@@ -119,26 +120,32 @@ public class Main{
 		} catch (FileNotFoundException e) {
 			return null;
 		}
+
 		noOfLines = GetNumLines(file);
-
-		//System.out.println(noOfLines);
-		// alocar memoria para CSV, falta só pegar a largura a ser alocada
-
-		toReturn = new double[4][5];
+		if (noOfLines == -1)
+			return (null);
 		while (ReadFile.hasNextLine())
 		{
 			Csv = ReadFile.nextLine().split(regex);
+			if (j == 0)
+			{
+				noOfColumns = Csv.length;
+				toReturn = new double[noOfLines][noOfColumns];
+			}
 			for (int i = 0; i < 5; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 			j++;
 		}
-		for (int i = 0; i < 4; i++) {
-			for (int k = 0; k < 5; k++) {
+
+		// this will desapear
+		for (int i = 0; i < noOfLines; i++) {
+			for (int k = 0; k < noOfColumns; k++) {
 				System.out.printf("%.1f ", toReturn[i][k]);
 			}
 			System.out.println();
 		}
-		return (null);
+		// until here
+		return (toReturn);
 	}
 
 	public static int GetNumLines(File file)
