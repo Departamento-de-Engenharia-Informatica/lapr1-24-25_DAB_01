@@ -82,6 +82,7 @@ public class Main{
 		System.out.println("(1) Decomposition of images");
 		System.out.println("(2) Rebuild images");
 		System.out.println("(3) Identify closest");
+		System.out.printf("> ");
 
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 		{
@@ -202,6 +203,39 @@ public class Main{
 		return null;
 	}
 
+	public static boolean matrixToCSV(CRSMatrix matrix, String outputPath){
+		int height = matrix.rows();
+		int width = matrix.columns();
+
+		try {
+			BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputPath));
+
+			for(int i = 0; i < height; i++){
+				String line = "";
+
+				for(int j = 0; j < width; j++){
+					line += (int) matrix.get(i, j);
+					
+					if(j != width-1){
+						line += ",";
+					}
+				}
+				System.out.println(line);
+				outputFile.write(line);
+				outputFile.newLine();
+			}
+
+			outputFile.close();
+
+			return true;
+
+		  } catch (IOException e) {
+			System.out.println("Não é possível criar o ficheiro de saída.");
+
+			return false;
+		  }
+	}
+
 	//==================Functionalities==================//
 	//=========1=========//
 	public static void Decomposition(int own_values, String csvPath)
@@ -216,8 +250,10 @@ public class Main{
 	}
 
 	//=========3=========//
-	public static void SearchClosest(int own_values, String csvPath, String dirPath)
+	public static void SearchClosest(int SearchOwnValues, String inputPath, String db)
 	{
+		CRSMatrix identifying = CSVtoMatrix(inputPath);
+
 
 	}
 
