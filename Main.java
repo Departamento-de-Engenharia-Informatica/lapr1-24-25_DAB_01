@@ -283,14 +283,43 @@ public class Main{
 		}
 		return minValue;
 	}
-	public static void Decomposition(int own_values, String csvPath)
+
+	public static void printMatrix(RealMatrix matrix){
+
+		for (int rows = 0; rows < matrix.getRowDimension(); rows++) {
+			for (int columns = 0; columns < matrix.getColumnDimension(); columns++) {
+				System.out.printf("%6.3f ",matrix.getEntry(rows, columns));
+			}
+			System.out.println();
+		}
+		System.out.println();
+
+	}
+
+	public static RealMatrix[] Decomposition(int own_values, String csvPath)
 	{
 		RealMatrix matrix = CSVtoMatrix(csvPath);
 
 		EigenDecomposition eiganDecompositor = new EigenDecomposition(matrix);
-		RealMatrix eiganVectoes = eiganDecompositor.getV();
+
+		RealMatrix eiganVectors = eiganDecompositor.getV();
 		RealMatrix eiganValues = eiganDecompositor.getD();
 
+		int totalNumberOfOwnValues = eiganValues.getColumnDimension();
+
+		if (own_values >= totalNumberOfOwnValues){
+            return new RealMatrix[]{eiganVectors, eiganValues};
+		}else {
+
+
+
+		}
+
+
+
+
+
+		return new RealMatrix[]{eiganVectors, eiganValues};
 	}
 
 	//=========2=========//
