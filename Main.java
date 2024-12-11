@@ -2,6 +2,7 @@ import org.la4j.matrix.sparse.CRSMatrix;
 import org.la4j.*;
 import java.io.*;
 import	java.util.Scanner;
+import java.util.Vector;
 import	java.lang.Object;
 
 // equals -> compare matrixes
@@ -289,6 +290,24 @@ public class Main{
 	//=========3=========//
 	public static void SearchClosest(int own_values, String csvPath, String dirPath)
 	{
+		CRSMatrix identifying = CSVtoMatrix(inputPath);
+
+		Vector avgDb; // vetor coluna 
+
+		CSRMatrix covarianceMatrix; // matriz de covariancia
+
+		// calcular valores proprios matriz covariancia
+		
+		EigenDecompositor decompositor = new EigenDecompositor(matrix);
+        Matrix[] decomposition = decompositor.decompose();
+
+        // Valores próprios (matriz diagonal)
+        Matrix eigenValues = decomposition[0];
+        System.out.println("Valores Próprios (Diagonal):");
+        System.out.println(eigenValues);
+
+		CSRMatrix matrix_ = matrix.transform((i, j, value) -> value - columnVector.get(i));
+
 
 	}
 
