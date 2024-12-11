@@ -1,9 +1,10 @@
-import org.la4j.*;
-import java.io.*;
 import	java.util.Scanner;
-import java.util.Vector;
+import java.io.*;
 import	java.lang.Object;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 // equals -> compare matrixes
 
 public class Main{
@@ -17,7 +18,7 @@ public class Main{
 	public static void main(String[] args)
 	{
 		if (args.length > 0)
-			NonIterative(args);	
+			NonIterative(args);
 		else
 			Iterative();
 	}
@@ -73,7 +74,6 @@ public class Main{
 		int			own_values;
 		String		path;
 		String		dirPath;
-		CRSMatrix	matrix;
 
 		type = 1;
 		while(type != 0)
@@ -126,10 +126,16 @@ public class Main{
 	{
 		int	read;
 
+		read = 0;
 		System.out.println("----------------------------------");
 		System.out.printf("Enter the number of own values that you want to use(columns):\n");
-		read = input.nextInt();
-		input.nextLine();
+		while (read <= 0)
+		{
+			read = input.nextInt();
+			input.nextLine();
+			if(read <= 0)
+				System.out.println("You need to enter a non zero positive number. Try again!");
+		}
 		return read;
 	}
 
@@ -144,10 +150,10 @@ public class Main{
 	}
 
 	//=========Matrix Read=========//
-	public static Matrix CSVtoMatrix(String filename)
+	public static RealMatrix CSVtoMatrix(String filename)
 	{
 		double[][]	csv;
-		Matrix	matrix;
+		RealMatrix	matrix;
 
 		csv = ReadingCsv(filename);
 		if(csv == null)
@@ -155,15 +161,7 @@ public class Main{
 			System.out.println("File does not exist!");
 			return (null);
 		}
-
-		matrix = new Basic2DMatrix(csv.length, csv[0].length);
-		for (int i = 0; i < csv.length; i++) {
-			for (int j = 0; j < csv[i].length; j++) {
-				if (csv[i][j] != 0.0) {
-					matrix.set(i, j, csv[i][j]);
-				}
-			}
-		}
+		matrix = new Array2DRowRealMatrix(csv);
 		return (matrix);
 	}
 
@@ -202,14 +200,14 @@ public class Main{
 			j++;
 		}
 
-		// this will desapear
-//		for (int i = 0; i < noOfLines; i++) {
-//			for (int k = 0; k < noOfColumns; k++) {
-//				System.out.printf("%.1f ", toReturn[i][k]);
-//			}
-//			System.out.println();
-//		}
-		// until here
+		/*	// this will desapear
+		for (int i = 0; i < noOfLines; i++) {
+			for (int k = 0; k < noOfColumns; k++) {
+				System.out.printf("%.1f ", toReturn[i][k]);
+			}
+			System.out.println();
+		}
+		// until here */
 		return (toReturn);
 	}
 
@@ -275,78 +273,24 @@ public class Main{
 
 	//==================Functionalities==================//
 	//=========1=========//
-	public static double getMinValueOfDiagonalMatrix(Matrix matrix){
-		double minValue = Math.abs(matrix.get(0, 0));
+	public static double getMinValueOfDiagonalMatrix(RealMatrix matrix){
+		double minValue = Math.abs(matrix.getEntry(0, 0));
 
-		for (int i = 0; i < matrix.rows(); i++) {
-				if (Math.abs(matrix.get(i, i)) < minValue){
-					minValue = Math.abs(matrix.get(i, i));
+		for (int i = 0; i < matrix.getColumnDimension(); i++) {
+			if (Math.abs(matrix.getEntry(i, i)) < minValue){
+				minValue = Math.abs(matrix.getEntry(i, i));
 			}
 		}
 		return minValue;
 	}
-
-	public static Matrix[] Decomposition(int own_values, String csvPath)
+	public static void Decomposition(int own_values, String csvPath)
 	{
-		Matrix matrix = CSVtoMatrix(csvPath);
+		RealMatrix matrix = CSVtoMatrix(csvPath);
 
-		EigenDecompositor decompositor = new EigenDecompositor(matrix);
-		Matrix[] decomposition = decompositor.decompose();
-		try{
-			Matrix eigenVectors = decomposition[0];
-			Matrix eigenValues = decomposition[1];
+		EigenDecomposition eiganDecompositor = new EigenDecomposition(matrix);
+		RealMatrix eiganVectoes = eiganDecompositor.getV();
+		RealMatrix eiganValues = eiganDecompositor.getD();
 
-			int totalNumberOfOwnValues = eigenValues.columns();
-
-			if (own_values >= totalNumberOfOwnValues){
-				return decomposition;
-
-			}else {
-				int numberOfOwnValuesToRemove = totalNumberOfOwnValues - own_values;
-				double valueOfColumToRemove;
-				boolean flag;
-
-				System.out.println(eigenVectors);
-				System.out.println(eigenValues);
-
-
-				for (int i = 0; i < numberOfOwnValuesToRemove; i++) {
-					flag = false;
-					valueOfColumToRemove = getMinValueOfDiagonalMatrix(eigenValues);
-
-					for (int rows = 0; rows < eigenValues.rows(); rows++){
-						if (flag){
-							break;
-						}
-						for (int columns = 0; columns < eigenValues.columns(); columns++){
-							double number = Math.abs(eigenValues.get(rows, columns)) ;
-							if (number == valueOfColumToRemove){
-								eigenValues = eigenValues.removeRow(rows);
-								eigenValues = eigenValues.removeColumn(columns);
-								eigenVectors = eigenVectors.removeRow(rows);
-								eigenVectors = eigenVectors.removeColumn(columns);
-								flag = true;
-								break;
-							}
-
-						}
-
-					}
-
-				}
-				System.out.println(eigenVectors);
-				System.out.println(eigenValues);
-
-
-
-			}
-
-
-
-		}catch (Exception IllegalArgumentException){
-			System.out.println("EROROROROORORO");
-		}
-		return decomposition;
 	}
 
 	//=========2=========//
@@ -358,24 +302,24 @@ public class Main{
 	//=========3=========//
 	public static void SearchClosest(int own_values, String csvPath, String dirPath)
 	{
-//		CSRMatrix identifying = CSVtoMatrix(inputPath);
-//
-//		Vector avgDb; // vetor coluna
-//
-//		CSRMatrix covarianceMatrix; // matriz de covariancia
-//
-//		// calcular valores proprios matriz covariancia
-//
-//		EigenDecompositor decompositor = new EigenDecompositor(matrix);
-//        Matrix[] decomposition = decompositor.decompose();
-//
-//        // Valores próprios (matriz diagonal)
-//        Matrix eigenValues = decomposition[0];
-//        System.out.println("Valores Próprios (Diagonal):");
-//        System.out.println(eigenValues);
-//
-//		CSRMatrix matrix_ = matrix.transform((i, j, value) -> value - columnVector.get(i));
+/* 		CRSMatrix identifying = CSVtoMatrix(inputPath);
 
+		Vector avgDb; // vetor coluna
+
+		CSRMatrix covarianceMatrix; // matriz de covariancia
+
+		// calcular valores proprios matriz covariancia
+
+		EigenDecompositor decompositor = new EigenDecompositor(matrix);
+        Matrix[] decomposition = decompositor.decompose();
+
+        // Valores próprios (matriz diagonal)
+        Matrix eigenValues = decomposition[0];
+        System.out.println("Valores Próprios (Diagonal):");
+        System.out.println(eigenValues);
+
+		CSRMatrix matrix_ = matrix.transform((i, j, value) -> value - columnVector.get(i));
+ */
 
 	}
 
