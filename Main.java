@@ -1,7 +1,4 @@
-import org.la4j.decomposition.EigenDecompositor;
-import org.la4j.matrix.dense.Basic2DMatrix;
-import org.la4j.matrix.sparse.CRSMatrix;
-import org.la4j.*;
+
 import java.io.*;
 import	java.util.Scanner;
 import java.util.Vector;
