@@ -2,19 +2,16 @@
 import	java.util.Scanner;
 import java.io.*;
 import	java.lang.Object;
-import java.awt.image.BufferedImage;
+
+import org.apache.commons.math3.linear.*;
 import javax.imageio.ImageIO;
-
-import org.apache.commons.math3.linear.Array2DRowdouble[][];
-import org.apache.commons.math3.linear.double[][];
-
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;
-
+import java.awt.image.BufferedImage;
 
 public class Main{
-	public static final int MIN_OWN_VALUE = -1;
+	public static boolean hasOutputInFile = false;
+	public static String outputFilePath;
 
+	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
 	public static final int MAX_TYPE_EXEC = 3;
 
@@ -28,55 +25,90 @@ public class Main{
 			Iterative();
 	}
 
+	//===========Non-Iterative exec and reading===========//
 	// compilation == java -jar nome programa.jar -f X -k Y -i Z -d W
 	public static void NonIterative(String[] arguments)
 	{
 		int			type;
-		int			own_values;
+		int			ownValues;
 		String		path;
 		String		dirPath;
+		String		whereToWrite;
 
-		if (!(CheckingArgs(arguments)))
+		if (!arguments[0].equals("-f"))
 		{
 			System.out.println("You've entered some wrong argument!! Check it and try again!!");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
-		own_values = Integer.parseInt(arguments[3]);
 		switch (type) {
 			case 1:
+				if (CheckingArgs(arguments, 1))
+					break ;
+				ownValues = Integer.parseInt(arguments[4]);
 				path = arguments[6];
-				Decomposition(own_values, path);
+				whereToWrite = arguments[7];
+				// function
 			case 2:
-				dirPath = arguments[8];
-				Recomposition(own_values, dirPath);
+				if (CheckingArgs(arguments, 2))
+					break ;
+				ownValues = Integer.parseInt(arguments[4]);
+				dirPath = arguments[6];
+				whereToWrite = arguments[7];
+				// function
 			case 3:
+				if (CheckingArgs(arguments, 3))
+					break ;
+				ownValues = Integer.parseInt(arguments[4]);
 				path = arguments[6];
 				dirPath = arguments[8];
-				SearchClosest(own_values, path, dirPath);
+				whereToWrite = arguments[9];
+				// function
+			default:
+				System.out.println("You've entered some wrong argument!! Check it and try again!!");
+				break;
 		}
 	}
 
-	public static boolean CheckingArgs(String[] arguments)
+	public static boolean CheckingArgs(String[] arguments, int whichExec)
 	{
-		if (arguments.length != 8)
-			return (false);
-		if(!(arguments[0].equals("-f")))
-			return (false);
-		if(!(arguments[2].equals("-k")))
-			return (false);
-		if(!(arguments[4].equals("-i")))
-			return (false);
-		if(!(arguments[6].equals("-d")))
-			return (false);
+		if (whichExec == 1)
+		{
+			if(!(arguments[2].equals("-k")))
+				return (false);
+			if(!(arguments[4].equals("-i")))
+				return (false);
+			if (arguments.length != 7)
+				return (false);
+		}
+		else if (whichExec == 2)
+		{
+			if(!(arguments[2].equals("-k")))
+				return (false);
+			if(!(arguments[4].equals("-i")))
+				return (false);
+			if (arguments.length != 7)
+				return (false);
+		}
+		else if (whichExec == 3)
+		{
+			if(!(arguments[2].equals("-k")))
+				return (false);
+			if(!(arguments[4].equals("-i")))
+				return (false);
+			if(!(arguments[6].equals("-d")))
+				return (false);
+			if (arguments.length != 9)
+				return (false);
+		}
 		return (true);
 	}
 
-	//=========Iterative exec and reading=========//
+	//============Iterative exec and reading=============//
 	public static void Iterative()
 	{
 		int			type;
-		int			own_values;
+		int			ownValues;
 		String		path;
 		String		dirPath;
 
@@ -86,20 +118,20 @@ public class Main{
 			type = TypeOfExecution();
 			if (type == 0)
 				break ;
-			own_values = OwnValues();
+			ownValues = OwnValues();
 			switch (type) {
 				case 1:
 					path = GetPath("|Enter the file PATH of execution:|\n");
-					Decomposition(own_values, path);
+					doingFunctionOne(ownValues, path);
 					break;
 				case 2:
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
-					Recomposition(own_values, dirPath);
+					Recomposition(ownValues, dirPath);
 					break;
 				case 3:
 					path = GetPath("|Enter the file PATH of execution:|\n");
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
-					SearchClosest(own_values, path, dirPath);
+					SearchClosest(ownValues, path, dirPath);
 					break;
 			}
 		}
@@ -207,15 +239,6 @@ public class Main{
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 			j++;
 		}
-		/*
-		// this will desapear
-		for (int i = 0; i < noOfLines; i++) {
-			for (int k = 0; k < noOfColumns; k++) {
-				System.out.printf("%.1f ", toReturn[i][k]);
-			}
-			System.out.println();
-		}
-		// until here */
 		return (toReturn);
 	}
 
@@ -281,71 +304,207 @@ public class Main{
 
 	//==================Functionalities==================//
 	//=========1=========//
-
-    public static double avgAbsolutError(double[][] originalMatrix, double[][] partialMatrix){
-        int height = originalMatrix.length;
-        int width = originalMatrix[0].length;
-
-        double absolutSum = 0;
-
-        for(int i = 0; i < height; i++){
-            for(int j = 0; j < width; j++){
-                if(i < partialMatrix.length && j < partialMatrix[0].length){
-                    absolutSum += Math.abs(originalMatrix[i][j] - partialMatrix[i][j]);
-                }else{
-                    absolutSum += Math.abs(originalMatrix[i][j]);
-                }
-            }
-        }
-
-        absolutSum /= height*width;
-
-        return absolutSum;
-    }
-
-    public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues){
-        double[][] intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
-
-        double[][] result = matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
-
-        return result;
-    }
-
-	public static void Decomposition(int own_values, String csvPath)
+	public static RealMatrix transformDoubleMatrixToRealMatrix(double[][] matrixdouble)
 	{
+		RealMatrix matrixreal = new Array2DRowRealMatrix(matrixdouble.length, matrixdouble[0].length);
 
+		for (int rows = 0; rows < matrixdouble.length; rows++) {
+			for (int colums = 0; colums < matrixdouble[0].length; colums++) {
+				matrixreal.setEntry(rows, colums, matrixdouble[rows][colums]);
+			}
+		}
+		return matrixreal;
+	}
+
+	public static boolean isValueInArray(double value, int[] array) {
+		for (double number : array) {
+			if (value == number) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static int[] getCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int numberOfValues)
+	{
+		double minValue;
+		int coordinates;
+		int[] arrayOfCoordinates;
+
+		arrayOfCoordinates = new int[numberOfValues];
+		for (int i = 0; i < numberOfValues; i++) {
+			minValue = Math.abs(matrix[0][0]);
+			coordinates = 0;
+			for (int j = 0; j < matrix[0].length; j++) {
+				if (Math.abs(matrix[j][j]) < minValue && !isValueInArray(j, arrayOfCoordinates)) {
+					minValue = Math.abs(matrix[j][j]);
+					coordinates = j;
+				}
+			}
+			arrayOfCoordinates[i] = coordinates;
+		}
+		return arrayOfCoordinates;
+	}
+
+	public static double[][] getEigenValuesSubMatrix(int[] arrayOfCoordinates, double[][] matrix)
+	{
+		int index = 0;
+		int numberOfCoordinates = matrix.length - arrayOfCoordinates.length;
+		double[][] eigenValuesSubMatrix = new double[numberOfCoordinates][numberOfCoordinates];
+
+		for (int i = 0; index < numberOfCoordinates; i++) {
+			if (!isValueInArray(i, arrayOfCoordinates)) {
+				eigenValuesSubMatrix[index][index] = matrix[i][i];
+				index++;
+			}
+		}
+		return eigenValuesSubMatrix;
+	}
+
+	public static double[][] getEigenVectorsSubMatrix(int[] arrayOfCoordinates, double[][] matrix)
+	{
+		int indexOfColumns;
+		int numberOfCoordinates = matrix.length - arrayOfCoordinates.length;
+		double[][] eigenValuesSubMatrix = new double[matrix.length][numberOfCoordinates];
+
+		for (int i = 0; i < matrix.length; i++) {
+			indexOfColumns = 0;
+			for (int j = 0; indexOfColumns < numberOfCoordinates; j++) {
+				if (!isValueInArray(j, arrayOfCoordinates)) {
+					eigenValuesSubMatrix[i][indexOfColumns] = matrix[i][j];
+					indexOfColumns++;
+				}
+			}
+		}
+
+		return eigenValuesSubMatrix;
+	}
+
+	public static double[][][] Decomposition(int own_values, String csvPath)
+	{
+		double[][] matrix = CSVtoMatrix(csvPath);
+		double[][][] resultMatrix;
+
+		EigenDecomposition eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(matrix));
+
+		RealMatrix eiganVectorsApache = eiganDecompositor.getV();
+		RealMatrix eiganValuesApache = eiganDecompositor.getD();
+
+		double[][] eiganVectors = eiganVectorsApache.getData();
+		double[][] eiganValues = eiganValuesApache.getData();
+
+		int totalNumberOfOwnValues = eiganValues.length;
+
+		double[][] eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
+		double[][] eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
+
+		if (own_values < totalNumberOfOwnValues && own_values != -1) {
+			int numberValuesToRemove = totalNumberOfOwnValues - own_values;
+			int[] arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
+
+			eiganVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
+			eiganValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
+
+			resultMatrix = new double[][][]{eiganVectorsSubMatrix, eiganValuesSubMatrix};
+		} else {
+			resultMatrix = new double[][][]{eiganVectors, eiganValues};
+		}
+
+		return resultMatrix;
+	}
+
+	public static double avgAbsolutError(double[][] originalMatrix, double[][] partialMatrix)
+	{
+		int height = originalMatrix.length;
+		int width = originalMatrix[0].length;
+
+		double absolutSum = 0;
+
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				if (i < partialMatrix.length && j < partialMatrix[0].length) {
+					absolutSum += Math.abs(originalMatrix[i][j] - partialMatrix[i][j]);
+				} else {
+					absolutSum += Math.abs(originalMatrix[i][j]);
+				}
+			}
+		}
+
+		absolutSum /= height * width;
+
+		return absolutSum;
+	}
+
+	public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues)
+	{
+		double[][] intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
+
+		return matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
+	}
+
+	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, String path)
+	{
+		System.out.printf("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length);
+
+		System.out.println("Matriz de vetores próprios::");
+		printMatrix(ownVs[0]);
+
+		System.out.println("Matriz de valores próprios::");
+		printMatrix(ownVs[1]);
+
+		System.out.print("Matriz resultante da multiplicação das matrizes decompostas::\n");
+		printMatrix(decompressedMatrix);
+
+		if (ownVs[0].length == decompressedMatrix.length || ownValues == -1) {
+			System.out.println("O Erro Absoluto Médio é :: 0\n");
+		} else {
+			System.out.printf("O Erro Absoluto Médio é :: %.3f\n", avgAbsolutError(CSVtoMatrix(path), decompressedMatrix));
+		}
+	}
+
+	public static void doingFunctionOne(int ownValues, String path)
+	{
+		double[][] decompressedMatrix;
+		double[][][] ownVs;
+
+		ownVs = Decomposition(ownValues, path);
+		decompressedMatrix = calculateDecompressedMatrix(ownVs[0], ownVs[1]);
+		printDecomposition(ownVs, decompressedMatrix, ownValues,  path);
 	}
 
 	//=========2=========//
-	public static void Recomposition(int own_values, String csvPath)
+	public static void Recomposition(int ownValues, String dirPath)
 	{
-
-	}
-
-	//=========3=========//
-	public static void SearchClosest(int qtyEigenValuesForSearch, String csvPath, String dirPath)
-	{
-		//double[][]			matrix;
-		//RealVector			mediumVector;
-		double[][][]	MatrixInVector ;
+		/*
+		double[]			mediumVector;
+		double[][]			matrixInVector;
+		double[][]			covarianceMatrix;
 		String[]			PathToCompare;
 		String[]			csvFilesInFolder;
 		int					height;
 
 
 		csvFilesInFolder = ReadingDir(dirPath);
-		MatrixInVector = AllImgsInVector(csvFilesInFolder);
-/*
-		System.out.println("\n\nnow build the medium vector:");
-		mediumVector = CalculateMediumVector(MatrixInVector);
-		System.out.println(mediumVector);
-
-		System.out.println("\n\nnow it Will build Fi :");
-		matrix = MatrixOfFi(MatrixInVector, mediumVector);
-		System.out.println("\n" + matrix + "\n"); */
+		matrixInVector = AllImgsInVector(csvFilesInFolder);
+		mediumVector = CalculateMediumVector(matrixInVector);
+		covarianceMatrix = buildCovarianceMatrix(matrixInVector, mediumVector);
+		System.out.println();
+		printMatrix(covarianceMatrix);
+		*/
+		VerticalVectorMatrix(ownValues, dirPath);
 	}
 
- 	public static double[][] AllImgsInVector(String[] files)
+	public static void VerticalVectorMatrix(int OwnValues, String dirPath)
+	{
+		String[] dirCsvFiles;
+		double[][] verticalVectorMatrix;
+
+		dirCsvFiles = ReadingDir(dirPath);
+		verticalVectorMatrix = AllImgsInVector(dirCsvFiles);
+		printMatrix(verticalVectorMatrix);
+	}
+
+	public static double[][] AllImgsInVector(String[] files)
 	{
 		double[][]			allImgsInVector;
 		int					fileLength;
@@ -354,95 +513,59 @@ public class Main{
 		allImgsInVector = new double[fileLength][];
 		for (int i = 0; i < fileLength; i++)
 			allImgsInVector[i] = MatrixToVerticalVector(CSVtoMatrix(files[i]));
+		printMatrix(allImgsInVector);
 		return (allImgsInVector);
 	}
 
-	public static double[][] ImgToVector(double[][] matrix)
+	public static double[] CalculateMediumVector(double[][] allImgsInVector)
 	{
-		double[][]			matrixInVector;
-		int					matrixManyRows;
-		int					matrixManyColumns;
-		int					pos = 0;
-
-		matrixManyColumns = matrix[0].length;
-		matrixManyRows = matrix.length;
-		matrixInVector = new double[matrixManyColumns][matrixManyRows];
-		for (int i = 0; i < matrixManyColumns; i++)
-			for (int j = 0; j < matrixManyRows; j++)
-				matrixInVector[i][j] = matrix[j][i];
-
-																									//writing vector
-		System.out.println("----------	new vector	------------");
-		for (int i = 0; i < matrixManyColumns; i++)
-		{
-				for (int j = 0; j < matrixManyRows; j++)
-					System.out.printf("%.2f ", matrixInVector[i][j]);
-			System.out.println();
-		}
-																									//writing vector
-		return (matrixInVector);
-	}
-
-	public static RealVector CalculateMediumVector(ArrayRealVector[] AllImgsInVector)
-	{
-		RealVector	mediumVector;
+		double[]	mediumVector;
+		int			vectorItens;
 		int			manyVectors;
 
-		manyVectors = AllImgsInVector.length;
-		mediumVector = new ArrayRealVector(AllImgsInVector[0].getDimension());
-		for (int i = 0; i < manyVectors; i++)
-			mediumVector = mediumVector.add(AllImgsInVector[i]);
-		mediumVector = mediumVector.mapDivide(manyVectors);
-		return mediumVector;
-	}
-
-
-
-
-
-	public static double[][] MatrixOfFi(ArrayRealVector[] allImgsInVector, RealVector mdiumVector)
-	{
-		double[][]			fiMatrix;
-		ArrayRealVector[]	allFiVectors;
-		int					manyVectors;
-		int					manyColumns;
-
 		manyVectors = allImgsInVector.length;
-		manyColumns = allImgsInVector[0].getDimension();
-		allFiVectors = FiVectors(allImgsInVector, mdiumVector, manyColumns, manyVectors);
-		fiMatrix = transformToMatrix(allFiVectors, manyVectors, manyColumns);
-		return (fiMatrix);
+		vectorItens = allImgsInVector[0].length;
+		mediumVector = new double[manyVectors];
+		for (int i = 0; i < vectorItens; i++)
+			for (int j = 0; j < manyVectors; j++)
+				mediumVector[i] += allImgsInVector[j][i];
+		mediumVector = vectorDivConst(mediumVector, manyVectors);
+		System.out.println();
+		for (int i = 0; i < vectorItens; i++)
+			System.out.printf("%.1f ",mediumVector[i]);
+		System.out.println();
+		System.out.println();
+		return (mediumVector);
 	}
 
-	public static double[][] transformToMatrix(ArrayRealVector[] allFiVectors, int manyVectors, int manyColumns)
+	public static double[][] buildCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
 	{
-		double[][]			fiMatrix;
+		int height = allImagesMatrix.length;
+		int width = allImagesMatrix[0].length;
 
-		fiMatrix = new Array2DRowdouble[][](manyColumns, manyVectors);
-		for (int i = 0; i < manyVectors; i++)
-			for (int j = 0; j < manyColumns; j++)
-				fiMatrix.addToEntry(j, i, allFiVectors[i].getEntry(j));
-		return (fiMatrix);
+		double[][] matrix = new double[height][width];
+
+		mediumVector = vectorMultConst(mediumVector, -1);
+		for(int imgIndex = 0; imgIndex < height; imgIndex++)
+			matrix[imgIndex] = vectorAdd(allImagesMatrix[imgIndex], mediumVector);
+
+		mediumVector = vectorMultConst(mediumVector, -1);
+
+		System.out.println("A^t Matrix");
+		printMatrix(matrix);
+
+		double[][] intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix);
+		System.out.println("intermediaryMatrix");
+
+		printMatrix(intermediaryMatrix);
+		double[][] covarianceMatrix = matrixDivConst(intermediaryMatrix, height);
+		return covarianceMatrix;
 	}
 
-	public static ArrayRealVector[] FiVectors(ArrayRealVector[] allImgsInVector, RealVector mdiumVector, int manyColumns, int manyVectors)
+	//=========3=========//
+	public static void SearchClosest(int own_values, String csvPath, String dirPath)
 	{
-		ArrayRealVector[] fiVectors;
 
-		fiVectors = new ArrayRealVector[manyVectors];
-		for (int i = 0; i < manyVectors; i++)
-			fiVectors[i] = new ArrayRealVector(CalculatingFi(allImgsInVector[i], mdiumVector, manyColumns));
-		return (fiVectors);
-	}
-
-	public static RealVector CalculatingFi(RealVector vector, RealVector mdiumVector, int manyColumns)
-	{
-		RealVector fi;
-
-		fi = new ArrayRealVector(manyColumns);
-		fi = vector.add(mdiumVector.mapMultiply(-1));
-		System.out.println(fi);
-		return (fi);
 	}
 
 	//=============Matrix Operations=============//
@@ -454,23 +577,8 @@ public class Main{
 		martixLen = matrix1[0].length;
 		matrixHeight = matrix1.length;
 		for (int i = 0; i < matrixHeight; i++)
-		{
 			for (int j = 0; j < martixLen; j++)
 				matrix1[i][j] = matrix1[i][j] + matrix2[i][j];
-		}
-		return (matrix1);
-	}
-
-	public static double[][] matrixAddConst(double[][] matrix1, int value)
-	{
-		int			martixLen;
-		int			matrixHeight;
-
-		martixLen = matrix1[0].length;
-		matrixHeight = matrix1.length;
-		for (int i = 0; i < matrixHeight; i++)
-			for (int j = 0; j < martixLen; j++)
-				matrix1[i][j] = matrix1[i][j] + value;
 		return (matrix1);
 	}
 
@@ -481,16 +589,29 @@ public class Main{
 		int			matrixHeight;
 
 		martixLen = matrix1[0].length;
-		matrixHeight = matrix1.length;
+		matrixHeight = matrix2.length;
 		matrixResult = new double[martixLen][matrixHeight];
 		for (int k = 0; k < matrixResult.length; k++)
 		{
-			for (int i = k; i < matrixHeight; i++)
+			for (int i = 0; i < matrixHeight; i++)
 			{
 				for (int j = 0; j < martixLen; j++)
 					matrixResult[k][i] += matrix1[i][j] * matrix2[j][i];
 			}
 		}
+		return (matrixResult);
+	}
+
+	public static double[][] matrixDivConst(double[][] matrix1, int value)
+	{
+		int			martixLen;
+		int			matrixHeight;
+
+		martixLen = matrix1[0].length;
+		matrixHeight = matrix1.length;
+		for (int i = 0; i < matrixHeight; i++)
+			for (int j = 0; j < martixLen; j++)
+				matrix1[i][j] = matrix1[i][j] / value;
 		return (matrix1);
 	}
 
@@ -516,8 +637,8 @@ public class Main{
 		martixLen = matrix[0].length;
 		matrixHeight = matrix.length;
 		matrixResult = new double[martixLen][matrixHeight];
-		for (int i = 0; i < matrixResult.length; i++)
-			for (int j = 0; j < matrixResult.length; j++)
+		for (int i = 0; i < martixLen; i++)
+			for (int j = 0; j < matrixHeight; j++)
 				matrixResult[i][j] = matrix[j][i];
 		return (matrixResult);
 	}
@@ -535,10 +656,14 @@ public class Main{
 		{
 			for (int j = 0; j < columnNumber; j++)
 			{
-				verticalMatrix[index] =  matrix[i][j];
+				verticalMatrix[index] =  matrix[j][i];
 				index++;
 			}
 		}
+
+		System.out.println("------------------");
+		for (int i = 0; i < verticalMatrix.length; i++)
+				System.out.println(verticalMatrix[i]);
 		return verticalMatrix;
 	}
 
@@ -552,16 +677,6 @@ public class Main{
 		return (vector1);
 	}
 
-	public static double[] vectorAddConst(double[] vector1, int value)
-	{
-		int			vectorLen;
-
-		vectorLen = vector1.length;
-		for (int i = 0; i < vectorLen; i++)
-			vector1[i] = vector1[i] + value;
-		return (vector1);
-	}
-
 	public static double[] vectorMult(double[] vector1, double[] vector2)
 	{
 		int			vectorLen;
@@ -569,6 +684,16 @@ public class Main{
 		vectorLen = vector1.length;
 		for (int i = 0; i < vectorLen; i++)
 			vector1[i] = vector1[i] * vector2[i];
+		return (vector1);
+	}
+
+	public static double[] vectorDivConst(double[] vector1, int value)
+	{
+		int			vectorLen;
+
+		vectorLen = vector1.length;
+		for (int i = 0; i < vectorLen; i++)
+			vector1[i] = vector1[i] / value;
 		return (vector1);
 	}
 
@@ -582,69 +707,86 @@ public class Main{
 		return (vector1);
 	}
 
+	//=============Display Matrix=============//
+	public static void printMatrix(double[][] matrix)
+	{
+		for (int rows = 0; rows < matrix.length; rows++) {
+			for (int columns = 0; columns < matrix[0].length; columns++) {
+				System.out.printf("%8.3f ", matrix[rows][columns]);
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 
-    //=============Display Matrix=============//
+	public static boolean matrixToCSV(double[][] matrix, String outputPath)
+	{
+		int height = matrix.length;
+		int width = matrix[0].length;
 
-    public static void printMatrix(double[][] matrix) {
+		try {
+			BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputPath));
+			for(int i = 0; i < height; i++){
+				String line = "";
+				for(int j = 0; j < width; j++){
+					line += (int) matrix[i][j];
 
-        for (int rows = 0; rows < matrix.length; rows++) {
-            for (int columns = 0; columns < matrix[0].length; columns++) {
-                System.out.printf("%8.3f ", matrix[rows][columns]);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
+					if(j != width-1){
+						line += ",";
+					}
+				}
+				System.out.println(line);
+				outputFile.write(line);
+				outputFile.newLine();
+			}
+			outputFile.close();
+			return true;
+		} catch (IOException e) {
+			System.out.println("Not possible to create the file!");
+			return false;
+		}
+	}
 
-    public static boolean matrixToCSV(double[][] matrix, String outputPath){
-        int height = matrix.length;
-        int width = matrix[0].length;
+	public void matrixToJPG(int[][] matrix, String outputFilePath) throws IOException
+	{
+		int height = matrix.length;
+		int width = matrix[0].length;
 
-        try {
-            BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputPath));
-            for(int i = 0; i < height; i++){
-                String line = "";
-                for(int j = 0; j < width; j++){
-                    line += (int) matrix[i][j];
-                    
-                    if(j != width-1){
-                        line += ",";
-                    }
-                }
-                System.out.println(line);
-                outputFile.write(line);
-                outputFile.newLine();
-            }
-            outputFile.close();
-            return true;
-        } catch (IOException e) {
-            System.out.println("Não é possível criar o ficheiro de saída.");
-            return false;
-        }
-    }
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
-    public void matrixToJPG(int[][] matrix, String outputFilePath) throws IOException {
-        int height = matrix.length;
-        int width = matrix[0].length;
+		// Set the pixel intensities
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int intensity = matrix[y][x];
+				if (intensity < 0 || intensity > 255) {
+					throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
+				}
+				int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
+				image.setRGB(x, y, rgb);
+			}
+		}
 
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		// Write the image to the file
+		File outputFile = new File(outputFilePath);
+		ImageIO.write(image, "jpg", outputFile);
+	}
 
-        // Set the pixel intensities
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int intensity = matrix[y][x];
-                if (intensity < 0 || intensity > 255) {
-                    throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
-                }
-                int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
-                image.setRGB(x, y, rgb);
-            }
-        }
+	public static void displayOutput(String str)
+	{
+		if(hasOutputInFile)
+			System.out.println(str);
+		else{
+			try {
+				BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputFilePath));
 
-        // Write the image to the file
-        File outputFile = new File(outputFilePath);
-        ImageIO.write(image, "jpg", outputFile);
-    }
+				outputFile.write(str);
+				outputFile.newLine();
+
+				outputFile.close();
+
+			} catch (IOException e) {
+				// nao sei
+			}
+		}
+	}
 }
-
-
