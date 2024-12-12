@@ -2,9 +2,11 @@
 import	java.util.Scanner;
 import java.io.*;
 import	java.lang.Object;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.Array2DRowdouble[][];
+import org.apache.commons.math3.linear.double[][];
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
@@ -279,6 +281,36 @@ public class Main{
 
 	//==================Functionalities==================//
 	//=========1=========//
+
+    public static double avgAbsolutError(double[][] originalMatrix, double[][] partialMatrix){
+        int height = originalMatrix.length;
+        int width = originalMatrix[0].length;
+
+        double absolutSum = 0;
+
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+                if(i < partialMatrix.length && j < partialMatrix[0].length){
+                    absolutSum += Math.abs(originalMatrix[i][j] - partialMatrix[i][j]);
+                }else{
+                    absolutSum += Math.abs(originalMatrix[i][j]);
+                }
+            }
+        }
+
+        absolutSum /= height*width;
+
+        return absolutSum;
+    }
+
+    public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues){
+        double[][] intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
+
+        double[][] result = matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
+
+        return result;
+    }
+
 	public static void Decomposition(int own_values, String csvPath)
 	{
 
@@ -291,9 +323,9 @@ public class Main{
 	}
 
 	//=========3=========//
-	public static void SearchClosest(int own_values, String csvPath, String dirPath)
+	public static void SearchClosest(int qtyEigenValuesForSearch, String csvPath, String dirPath)
 	{
-		//RealMatrix			matrix;
+		//double[][]			matrix;
 		//RealVector			mediumVector;
 		double[][][]	MatrixInVector ;
 		String[]			PathToCompare;
@@ -313,17 +345,15 @@ public class Main{
 		System.out.println("\n" + matrix + "\n"); */
 	}
 
- 	public static double[][][] AllImgsInVector(String[] files)
+ 	public static double[][] AllImgsInVector(String[] files)
 	{
 		double[][]			allImgsInVector;
 		int					fileLength;
 
 		fileLength = files.length;
-		allImgsInVector = new double[fileLength][][];
+		allImgsInVector = new double[fileLength][];
 		for (int i = 0; i < fileLength; i++)
-			allImgsInVector[i] = ImgToVector(CSVtoMatrix(files[i]));
-		for (int i = 0; i < fileLength; i++)
-				System.out.println(allImgsInVector[i]);
+			allImgsInVector[i] = MatrixToVerticalVector(CSVtoMatrix(files[i]));
 		return (allImgsInVector);
 	}
 
@@ -370,9 +400,9 @@ public class Main{
 
 
 
-	public static RealMatrix MatrixOfFi(ArrayRealVector[] allImgsInVector, RealVector mdiumVector)
+	public static double[][] MatrixOfFi(ArrayRealVector[] allImgsInVector, RealVector mdiumVector)
 	{
-		RealMatrix			fiMatrix;
+		double[][]			fiMatrix;
 		ArrayRealVector[]	allFiVectors;
 		int					manyVectors;
 		int					manyColumns;
@@ -384,11 +414,11 @@ public class Main{
 		return (fiMatrix);
 	}
 
-	public static RealMatrix transformToMatrix(ArrayRealVector[] allFiVectors, int manyVectors, int manyColumns)
+	public static double[][] transformToMatrix(ArrayRealVector[] allFiVectors, int manyVectors, int manyColumns)
 	{
-		RealMatrix			fiMatrix;
+		double[][]			fiMatrix;
 
-		fiMatrix = new Array2DRowRealMatrix(manyColumns, manyVectors);
+		fiMatrix = new Array2DRowdouble[][](manyColumns, manyVectors);
 		for (int i = 0; i < manyVectors; i++)
 			for (int j = 0; j < manyColumns; j++)
 				fiMatrix.addToEntry(j, i, allFiVectors[i].getEntry(j));
@@ -551,4 +581,70 @@ public class Main{
 			vector1[i] = vector1[i] * value;
 		return (vector1);
 	}
+
+
+    //=============Display Matrix=============//
+
+    public static void printMatrix(double[][] matrix) {
+
+        for (int rows = 0; rows < matrix.length; rows++) {
+            for (int columns = 0; columns < matrix[0].length; columns++) {
+                System.out.printf("%8.3f ", matrix[rows][columns]);
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    public static boolean matrixToCSV(double[][] matrix, String outputPath){
+        int height = matrix.length;
+        int width = matrix[0].length;
+
+        try {
+            BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputPath));
+            for(int i = 0; i < height; i++){
+                String line = "";
+                for(int j = 0; j < width; j++){
+                    line += (int) matrix[i][j];
+                    
+                    if(j != width-1){
+                        line += ",";
+                    }
+                }
+                System.out.println(line);
+                outputFile.write(line);
+                outputFile.newLine();
+            }
+            outputFile.close();
+            return true;
+        } catch (IOException e) {
+            System.out.println("Não é possível criar o ficheiro de saída.");
+            return false;
+        }
+    }
+
+    public void matrixToJPG(int[][] matrix, String outputFilePath) throws IOException {
+        int height = matrix.length;
+        int width = matrix[0].length;
+
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+
+        // Set the pixel intensities
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int intensity = matrix[y][x];
+                if (intensity < 0 || intensity > 255) {
+                    throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
+                }
+                int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
+                image.setRGB(x, y, rgb);
+            }
+        }
+
+        // Write the image to the file
+        File outputFile = new File(outputFilePath);
+        ImageIO.write(image, "jpg", outputFile);
+    }
 }
+
+
