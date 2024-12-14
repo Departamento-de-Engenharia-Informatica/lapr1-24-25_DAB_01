@@ -23,6 +23,8 @@ public class Main{
 			NonIterative(args);
 		else
 			Iterative();
+
+		input.close();
 	}
 
 	//===========Non-Iterative exec and reading===========//
@@ -304,16 +306,18 @@ public class Main{
 
 	//==================Functionalities==================//
 	//=========1=========//
-	public static RealMatrix transformDoubleMatrixToRealMatrix(double[][] matrixdouble)
+	public static RealMatrix transformDoubleMatrixToRealMatrix(double[][] matrixDouble)
 	{
-		RealMatrix matrixreal = new Array2DRowRealMatrix(matrixdouble.length, matrixdouble[0].length);
+		RealMatrix matrixReal;
 
-		for (int rows = 0; rows < matrixdouble.length; rows++) {
-			for (int colums = 0; colums < matrixdouble[0].length; colums++) {
-				matrixreal.setEntry(rows, colums, matrixdouble[rows][colums]);
+		matrixReal = new Array2DRowRealMatrix(matrixDouble.length, matrixDouble[0].length);
+
+		for (int rows = 0; rows < matrixDouble.length; rows++) {
+			for (int colums = 0; colums < matrixDouble[0].length; colums++) {
+				matrixReal.setEntry(rows, colums, matrixDouble[rows][colums]);
 			}
 		}
-		return matrixreal;
+		return matrixReal;
 	}
 
 	public static boolean isValueInArray(double value, int[] array) {
@@ -327,9 +331,9 @@ public class Main{
 
 	public static int[] getCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int numberOfValues)
 	{
-		double minValue;
-		int coordinates;
-		int[] arrayOfCoordinates;
+		double 		minValue;
+		int 		coordinates;
+		int[] 		arrayOfCoordinates;
 
 		arrayOfCoordinates = new int[numberOfValues];
 		for (int i = 0; i < numberOfValues; i++) {
@@ -382,25 +386,47 @@ public class Main{
 
 	public static double[][][] Decomposition(int own_values, String csvPath)
 	{
-		double[][] matrix = CSVtoMatrix(csvPath);
-		double[][][] resultMatrix;
+		double[][] 				matrix;
+		double[][][] 			resultMatrix;
 
-		EigenDecomposition eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(matrix));
+		double[][] 				eiganVectors;
+		double[][] 				eiganValues;
 
-		RealMatrix eiganVectorsApache = eiganDecompositor.getV();
-		RealMatrix eiganValuesApache = eiganDecompositor.getD();
+		double[][] 				eiganVectorsSubMatrix;
+		double[][] 				eiganValuesSubMatrix;
 
-		double[][] eiganVectors = eiganVectorsApache.getData();
-		double[][] eiganValues = eiganValuesApache.getData();
+		int[] 					arrayOfCoordinatesOfMinOwnValues;
+		int 					numberValuesToRemove;
 
-		int totalNumberOfOwnValues = eiganValues.length;
+		EigenDecomposition 		eiganDecompositor;
 
-		double[][] eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
-		double[][] eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
+		RealMatrix 				eiganVectorsApache;
+		RealMatrix 				eiganValuesApache;
+
+		int 					totalNumberOfOwnValues;
+
+
+		matrix = CSVtoMatrix(csvPath);
+
+		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(matrix));
+
+		eiganVectorsApache = eiganDecompositor.getD();
+		eiganValuesApache = eiganDecompositor.getV();
+
+		eiganVectors = eiganVectorsApache.getData();
+		eiganValues = eiganValuesApache.getData();
+
+		totalNumberOfOwnValues = eiganValues.length;
+
+		eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
+		eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
+
+		eiganVectorsApache = eiganDecompositor.getV();
+		eiganValuesApache = eiganDecompositor.getD();
 
 		if (own_values < totalNumberOfOwnValues && own_values != -1) {
-			int numberValuesToRemove = totalNumberOfOwnValues - own_values;
-			int[] arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
+			numberValuesToRemove = totalNumberOfOwnValues - own_values;
+			arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
 
 			eiganVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
 			eiganValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
@@ -415,24 +441,41 @@ public class Main{
 
     public static double[][][] Decomposition(int own_values, double[][] covarianceMatrix)
 	{
-		double[][][] resultMatrix;
+		double[][][] 	resultMatrix;
 
-		EigenDecomposition eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
+		double[][] 		eiganVectors;
+		double[][] 		eiganValues;
 
-		RealMatrix eiganVectorsApache = eiganDecompositor.getV();
-		RealMatrix eiganValuesApache = eiganDecompositor.getD();
+		double[][] 		eiganVectorsSubMatrix;
+		double[][] 		eiganValuesSubMatrix;
 
-		double[][] eiganVectors = eiganVectorsApache.getData();
-		double[][] eiganValues = eiganValuesApache.getData();
+		int[] 			arrayOfCoordinatesOfMinOwnValues;
+		int 			numberValuesToRemove;
 
-		int totalNumberOfOwnValues = eiganValues.length;
+		int 			totalNumberOfOwnValues;
 
-		double[][] eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
-		double[][] eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
+		EigenDecomposition eiganDecompositor;
+
+		RealMatrix 		eiganVectorsApache;
+		RealMatrix 		eiganValuesApache;
+		
+		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
+
+		eiganVectorsApache = eiganDecompositor.getD();
+		eiganValuesApache = eiganDecompositor.getV();
+
+		eiganVectors = eiganVectorsApache.getData();
+		eiganValues = eiganValuesApache.getData();
+
+		totalNumberOfOwnValues = eiganValues.length;
+
+		eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
+		eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
+		
 
 		if (own_values < totalNumberOfOwnValues && own_values != -1) {
-			int numberValuesToRemove = totalNumberOfOwnValues - own_values;
-			int[] arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
+			numberValuesToRemove = totalNumberOfOwnValues - own_values;
+			arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
 
 			eiganVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
 			eiganValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
@@ -447,10 +490,13 @@ public class Main{
 
 	public static double avgAbsolutError(double[][] originalMatrix, double[][] partialMatrix)
 	{
-		int height = originalMatrix.length;
-		int width = originalMatrix[0].length;
+		int 		height;
+		int 		width;
+		double 		absolutSum;
 
-		double absolutSum = 0;
+		height = originalMatrix.length;
+		width = originalMatrix[0].length;
+		absolutSum = 0;
 
 		for (int i = 0; i < height; i++) {
 			for (int j = 0; j < width; j++) {
@@ -469,7 +515,9 @@ public class Main{
 
 	public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues)
 	{
-		double[][] intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
+		double[][] 		intermediaryMatrix;;
+		
+		intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
 
 		return matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
 	}
@@ -496,8 +544,8 @@ public class Main{
 
 	public static void doingFunctionOne(int ownValues, String path)
 	{
-		double[][] decompressedMatrix;
-		double[][][] ownVs;
+		double[][] 		decompressedMatrix;
+		double[][][] 	ownVs;
 
 		ownVs = Decomposition(ownValues, path);
 		decompressedMatrix = calculateDecompressedMatrix(ownVs[0], ownVs[1]);
@@ -528,8 +576,8 @@ public class Main{
 
 	public static void VerticalVectorMatrix(int OwnValues, String dirPath)
 	{
-		String[] dirCsvFiles;
-		double[][] verticalVectorMatrix;
+		String[] 		dirCsvFiles;
+		double[][] 		verticalVectorMatrix;
 
 		dirCsvFiles = ReadingDir(dirPath);
 		verticalVectorMatrix = AllImgsInVector(dirCsvFiles);
@@ -538,8 +586,8 @@ public class Main{
 
 	public static double[][] AllImgsInVector(String[] files)
 	{
-		double[][]			allImgsInVector;
-		int					fileLength;
+		double[][]		allImgsInVector;
+		int				fileLength;
 
 		fileLength = files.length;
 		allImgsInVector = new double[fileLength][];
@@ -571,9 +619,9 @@ public class Main{
 	}
 
 	public static double[][] calculateAllPhis(double[][] allImagesMatrix, double[] mediumVector){
-		int height;
-		int width;
-		double[][] matrix;
+		int 			height;
+		int 			width;
+		double[][] 		matrix;
 
 		height = allImagesMatrix.length;
 		width = allImagesMatrix[0].length;
@@ -590,24 +638,27 @@ public class Main{
 
 	public static double[][] buildCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
 	{
-		double[][] matrix;
+		double[][] 		matrix;
+		double[][] 		intermediaryMatrix;
+		double[][] 		covarianceMatrix;
 
 		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
 
 		System.out.println("A^t Matrix");
 		//printMatrix(matrix);
 
-		double[][] intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix);
+		intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix);
 		System.out.println("intermediaryMatrix");
 
 		//printMatrix(intermediaryMatrix);
-		double[][] covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
+		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
 		return covarianceMatrix;
 	}
 
 	//=========3=========//
     public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
-        double[] weights;
+        double[] 		weights;
+
         weights = new double[eigenVectors.length];
 
 		eigenVectors = matrixTranspose(eigenVectors);
@@ -620,9 +671,9 @@ public class Main{
     }
 
     public static double[] calculateNewPhi(String csvPath, double[] mediumVector){
-        double[][] imageMatrix;
-        double[] newPhi;
-        double[] imageVector;
+        double[][] 		imageMatrix;
+        double[] 		newPhi;
+        double[] 		imageVector;
 
         imageMatrix = CSVtoMatrix(csvPath);
 
@@ -639,20 +690,21 @@ public class Main{
     }
 
 	public static double calculateEuclideanDistance(double[] vector1, double[] vector2){
-		double distance;
+		double 		distance;
+
 		distance = 0;
 		for (int i = 0; i < vector2.length; i++) {
 			distance += Math.pow(vector1[i] - vector2[i], 2);
 		}
 
 		distance = Math.sqrt(distance);
-
+		
 		return distance;
 	}
 
 	public static int getIndexOfMinValueInArray(double[] array){
-		int index;
-		double minValue;
+		int 		index;
+		double 		minValue;
 
 		index = 0;
 		minValue = array[index];
@@ -669,48 +721,43 @@ public class Main{
 
 	public static void SearchClosest(int own_values, String csvPath, String dirPath)
 	{
-        String[] files;
-        double[][] allImagesVector;
-		double[] mediumVector;
+        String[] 		files;
+        double[][] 		allImagesVector;
+		double[] 		mediumVector;
 
-		double[] newPhi;
+		double[] 		newPhi;
 
-        double[][] covarianceMatrix;
-        double[][][] decomposedCovarianceMatrix;
+        double[][] 		covarianceMatrix;
+        double[][][] 	decomposedCovarianceMatrix;
 
-		double[] newWeights;
-		double[][] allPhis;
-		double[][] allWeights;
+		double[] 		newWeights;
+		double[][] 		allPhis;
+		double[][] 		allWeights;
 
-		double[] allEuclideanDistances;
+		double[] 		allEuclideanDistances;
 
-		int indexOfMinEuclideanDistance;
-
+		int 			indexOfMinEuclideanDistance;
 
 
         files = ReadingDir(dirPath);
         allImagesVector = AllImgsInVector(files);
-
         mediumVector = CalculateMediumVector(allImagesVector);
 
         newPhi = calculateNewPhi(csvPath, mediumVector);
 
         covarianceMatrix = buildCovarianceMatrix(allImagesVector, mediumVector);
-
         decomposedCovarianceMatrix = Decomposition(own_values, covarianceMatrix);
 
         newWeights = calculateWeights(decomposedCovarianceMatrix[0], newPhi);
-
 		allPhis = calculateAllPhis(allImagesVector, mediumVector);
-
-
 		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
+
+		allEuclideanDistances = new double[allWeights.length];
+
+
 		for (int i = 0; i < allImagesVector.length; i++) {
 			allWeights[i] = calculateWeights(decomposedCovarianceMatrix[0],allPhis[i]);
 		}
-
-
-		allEuclideanDistances = new double[allWeights.length];
 
 		for (int i = 0; i < allEuclideanDistances.length; i++) {
 			allEuclideanDistances[i] = calculateEuclideanDistance(newWeights, allWeights[i]);
@@ -720,8 +767,6 @@ public class Main{
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 
 		System.out.println(indexOfMinEuclideanDistance);
-
-
 	}
 
 	//=============Matrix Operations=============//
@@ -744,9 +789,11 @@ public class Main{
 		int			matrixLen;
 		int			matrixHeight;
 
-		matrixLen = matrix1[0].length;
 		matrixHeight = matrix2.length;
+		matrixLen = matrix1[0].length;
+
 		matrixResult = new double[matrixLen][matrixHeight];
+
 		for (int k = 0; k < matrixResult.length; k++)
 		{
 			for (int i = 0; i < matrixHeight; i++)
@@ -768,6 +815,8 @@ public class Main{
 
 		martixLen = matrix1[0].length;
 		matrixHeight = matrix1.length;
+
+
 		for (int i = 0; i < matrixHeight; i++)
 			for (int j = 0; j < martixLen; j++)
 				matrix1[i][j] = matrix1[i][j] / value;
@@ -781,6 +830,8 @@ public class Main{
 
 		martixLen = matrix1[0].length;
 		matrixHeight = matrix1.length;
+
+
 		for (int i = 0; i < matrixHeight; i++)
 			for (int j = 0; j < martixLen; j++)
 				matrix1[i][j] = matrix1[i][j] * value;
@@ -789,13 +840,15 @@ public class Main{
 
 	public static double[][] matrixTranspose(double[][] matrix)
 	{
-		double[][]	matrixResult;
 		int			martixLen;
 		int			matrixHeight;
+		double[][]	matrixResult;
 
 		martixLen = matrix[0].length;
 		matrixHeight = matrix.length;
 		matrixResult = new double[martixLen][matrixHeight];
+
+
 		for (int i = 0; i < martixLen; i++)
 			for (int j = 0; j < matrixHeight; j++)
 				matrixResult[i][j] = matrix[j][i];
@@ -805,11 +858,11 @@ public class Main{
 	//=============Vector Operations=============//
 	public static double[] MatrixToVerticalVector(double[][] matrix)
 	{
-		int columnNumber = matrix.length;
-		int rowNumber = matrix.length;
-		int numberOfElements = (columnNumber * rowNumber);
+		int 	 columnNumber = matrix.length;
+		int 	 rowNumber = matrix.length;
+		int 	 numberOfElements = (columnNumber * rowNumber);
 		double[] verticalMatrix = new double[numberOfElements];
-		int index = 0;
+		int 	 index = 0;
 
 		for (int i = 0; i < rowNumber; i++)
 		{
@@ -828,7 +881,7 @@ public class Main{
 
 	public static double[] vectorAdd(double[] vector1, double[] vector2)
 	{
-		int			vectorLen;
+		int		 vectorLen;
 
 		double[] addedVector;
 
@@ -886,13 +939,20 @@ public class Main{
 
 	public static boolean matrixToCSV(double[][] matrix, String outputPath)
 	{
-		int height = matrix.length;
-		int width = matrix[0].length;
+		int 			height;
+		int 			width;
+
+		BufferedWriter 	outputFile;
+		String 			line;
+		
+
+		height = matrix.length;
+		width = matrix[0].length;
 
 		try {
-			BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputPath));
+			outputFile = new BufferedWriter(new FileWriter(outputPath));
 			for(int i = 0; i < height; i++){
-				String line = "";
+				line = "";
 				for(int j = 0; j < width; j++){
 					line += (int) matrix[i][j];
 
@@ -914,10 +974,17 @@ public class Main{
 
 	public void matrixToJPG(int[][] matrix, String outputFilePath) throws IOException
 	{
-		int height = matrix.length;
-		int width = matrix[0].length;
+		int 			height;
+		int 			width;
 
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+		BufferedImage 	image;
+
+
+		height = matrix.length;
+		width = matrix[0].length;
+
+		image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+
 
 		// Set the pixel intensities
 		for (int y = 0; y < height; y++) {
@@ -938,11 +1005,13 @@ public class Main{
 
 	public static void displayOutput(String str)
 	{
+		BufferedWriter 	outputFile;
+
 		if(hasOutputInFile)
 			System.out.println(str);
 		else{
 			try {
-				BufferedWriter outputFile = new BufferedWriter(new FileWriter(outputFilePath));
+				outputFile = new BufferedWriter(new FileWriter(outputFilePath));
 
 				outputFile.write(str);
 				outputFile.newLine();
