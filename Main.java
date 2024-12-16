@@ -280,7 +280,7 @@ public class Main{
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 			j++;
 		}
-		
+
 		return (toReturn);
 	}
 
@@ -770,24 +770,23 @@ public class Main{
 		int			matrixLen;
 		int			matrixHeight;
 
-		matrixHeight = matrix2.length;
-		matrixLen = matrix1[0].length;
+		matrixHeight = matrix1.length;
+		matrixLen =  matrix2[0].length;
 
-		matrixResult = new double[matrixLen][matrixHeight];
-
+		matrixResult = new double[matrixHeight][matrixLen];
 		for (int k = 0; k < matrixResult.length; k++)
 		{
-			for (int i = 0; i < matrixHeight; i++)
+			for (int i = 0; i < matrixResult[0].length; i++)
 			{
-
-				for (int j = 0; j < matrixLen; j++) {
+				for (int j = 0; j < matrix1[0].length && j < matrix2.length; j++)
+				{
 					matrixResult[k][i] += matrix1[k][j] * matrix2[j][i];
 				}
-
 			}
 		}
 		return (matrixResult);
 	}
+
 
 	public static double[][] matrixDivConst(double[][] matrix1, int value)
 	{
