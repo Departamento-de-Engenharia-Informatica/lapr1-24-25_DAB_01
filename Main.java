@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 public class Main{
 	public static boolean hasOutputInFile = false;
 	public static String outputFilePath;
+	public static String pathWrite;
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -35,7 +36,6 @@ public class Main{
 		int			ownValues;
 		String		path;
 		String		dirPath;
-		String		whereToWrite;
 
 		if (!arguments[0].equals("-f"))
 		{
@@ -45,27 +45,42 @@ public class Main{
 		type = Integer.parseInt(arguments[1]);
 		switch (type) {
 			case 1:
-				if (CheckingArgs(arguments, 1))
-					break ;
-				ownValues = Integer.parseInt(arguments[4]);
-				path = arguments[6];
-				whereToWrite = arguments[7];
+				if (!CheckingArgs(arguments, 1))
+				{
+					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					return ;
+				}
+				ownValues = Integer.parseInt(arguments[3]);
+				path = arguments[5];
+				pathWrite = arguments[6];
+				System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
 				// function
+				break ;
 			case 2:
-				if (CheckingArgs(arguments, 2))
-					break ;
-				ownValues = Integer.parseInt(arguments[4]);
-				dirPath = arguments[6];
-				whereToWrite = arguments[7];
+				if (!CheckingArgs(arguments, 2))
+				{
+					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					return ;
+				}
+				ownValues = Integer.parseInt(arguments[3]);
+				dirPath = arguments[5];
+				pathWrite = arguments[6];
+				System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
 				// function
+				break ;
 			case 3:
-				if (CheckingArgs(arguments, 3))
-					break ;
-				ownValues = Integer.parseInt(arguments[4]);
-				path = arguments[6];
-				dirPath = arguments[8];
-				whereToWrite = arguments[9];
+				if (!CheckingArgs(arguments, 3))
+				{
+					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					return ;
+				}
+				ownValues = Integer.parseInt(arguments[3]);
+				path = arguments[5];
+				dirPath = arguments[7];
+				pathWrite = arguments[8];
+				System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
 				// function
+				break ;
 			default:
 				System.out.println("You've entered some wrong argument!! Check it and try again!!");
 				break;
@@ -115,6 +130,7 @@ public class Main{
 		String		dirPath;
 
 		type = 1;
+		pathWrite = null;
 		while(type != 0)
 		{
 			type = TypeOfExecution();
@@ -196,6 +212,25 @@ public class Main{
 		path = input.nextLine();
 		return (path);
 	}
+
+	//==============Output==============//
+	public static void outputFunction(String toPrint)
+	{
+		if (pathWrite == null)
+			System.out.printf("%s", toPrint);
+		else
+		{
+			BufferedWriter 	outputFile;
+			try {
+				outputFile = new BufferedWriter(new FileWriter(pathWrite));
+				outputFile.write(toPrint);
+				outputFile.close();
+			} catch (IOException e) {
+				System.out.println("Not possible to create the file!");
+			}
+		}
+	}
+
 
 	//=========Matrix Read=========//
 	public static double[][] CSVtoMatrix(String filename)
@@ -838,19 +873,19 @@ public class Main{
 		return (addedVector);
 	}
 
-	public static double vectorMulti(double[] matrix1, double[] matrix2)
+	public static double vectorMulti(double[] vector1, double[] vector2)
 	{
 		double	valueResult;
 
 		valueResult = 0;
-		for (int i = 0; i < matrix1.length; i++)
+		for (int i = 0; i < vector1.length; i++)
 		{
-			valueResult += matrix1[i] * matrix2[i];
+			valueResult += vector1[i] * vector2[i];
 		}
 		return (valueResult);
 	}
 
-	public static double[] vectorDivConst(double[] vector1, int value)
+	public static double[] vectorDivConst(double[] vector1, double value)
 	{
 		int			vectorLen;
 
@@ -860,7 +895,7 @@ public class Main{
 		return (vector1);
 	}
 
-	public static double[] vectorMultConst(double[] vector1, int value)
+	public static double[] vectorMultConst(double[] vector1, double value)
 	{
 		int			vectorLen;
 
@@ -1040,21 +1075,25 @@ public class Main{
 		return (vectorEquals(vector1,expected));
 	}
 
-	public static boolean testVectorMulti(double[] vector1, double[] vector2, double[] expected)
+	public static boolean testVectorMulti(double[] vector1, double[] vector2, double expected)
 	{
-		vector1 = vectorMulti(vector1, vector2);
+		double	value;
+
+		value = vectorMulti(vector1, vector2);
+		if(value == expected)
+			return (true);
+		return (false);
+	}
+
+	public static boolean testVectorDivConst(double[] vector1, double[] expected, double value)
+	{
+		vector1 = vectorMultConst(vector1, value);
 		return (vectorEquals(vector1,expected));
 	}
 
-	public static boolean testVectorDivConst(double[] vector1, double[] expected, int value)
+	public static boolean testVectorMultiConst(double[] vector1, double[] expected, double value)
 	{
-		vector1 = vectorMultiConst(vector1, value);
-		return (vectorEquals(vector1,expected));
-	}
-
-	public static boolean testVectorMultiConst(double[] vector1, double[] expected, int value)
-	{
-		vector1 = vectorMultiConst(vector1, 1);
+		vector1 = vectorMultConst(vector1, value);
 		return (vectorEquals(vector1,expected));
 	}
 
