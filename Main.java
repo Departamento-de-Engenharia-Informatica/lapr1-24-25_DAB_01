@@ -123,8 +123,12 @@ public class Main{
 			ownValues = OwnValues();
 			switch (type) {
 				case 1:
+					double[][] matrix;
+
 					path = GetPath("|Enter the file PATH of execution:|\n");
-					doingFunctionOne(ownValues, path);
+					matrix = CSVtoMatrix(path);
+
+					doingFunctionOne(ownValues, matrix);
 					break;
 				case 2:
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
@@ -381,61 +385,6 @@ public class Main{
 		return eigenValuesSubMatrix;
 	}
 
-	public static double[][][] Decomposition(int own_values, String csvPath)
-	{
-		double[][] 				matrix;
-		double[][][] 			resultMatrix;
-
-		double[][] 				eiganVectors;
-		double[][] 				eiganValues;
-
-		double[][] 				eiganVectorsSubMatrix;
-		double[][] 				eiganValuesSubMatrix;
-
-		int[] 					arrayOfCoordinatesOfMinOwnValues;
-		int 					numberValuesToRemove;
-
-		EigenDecomposition 		eiganDecompositor;
-
-		RealMatrix 				eiganVectorsApache;
-		RealMatrix 				eiganValuesApache;
-
-		int 					totalNumberOfOwnValues;
-
-
-		matrix = CSVtoMatrix(csvPath);
-
-		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(matrix));
-
-		eiganVectorsApache = eiganDecompositor.getD();
-		eiganValuesApache = eiganDecompositor.getV();
-
-		eiganVectors = eiganVectorsApache.getData();
-		eiganValues = eiganValuesApache.getData();
-
-		totalNumberOfOwnValues = eiganValues.length;
-
-		eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
-		eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
-
-		eiganVectorsApache = eiganDecompositor.getV();
-		eiganValuesApache = eiganDecompositor.getD();
-
-		if (own_values < totalNumberOfOwnValues && own_values != -1) {
-			numberValuesToRemove = totalNumberOfOwnValues - own_values;
-			arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
-
-			eiganVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
-			eiganValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
-
-			resultMatrix = new double[][][]{eiganVectorsSubMatrix, eiganValuesSubMatrix};
-		} else {
-			resultMatrix = new double[][][]{eiganVectors, eiganValues};
-		}
-
-		return resultMatrix;
-	}
-
     public static double[][][] Decomposition(int own_values, double[][] covarianceMatrix)
 	{
 		double[][][] 	resultMatrix;
@@ -458,8 +407,8 @@ public class Main{
 
 		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
 
-		eiganVectorsApache = eiganDecompositor.getD();
-		eiganValuesApache = eiganDecompositor.getV();
+		eiganVectorsApache = eiganDecompositor.getV();
+		eiganValuesApache = eiganDecompositor.getD();
 
 		eiganVectors = eiganVectorsApache.getData();
 		eiganValues = eiganValuesApache.getData();
@@ -519,7 +468,7 @@ public class Main{
 		return matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
 	}
 
-	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, String path)
+	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, double[][] matrix)
 	{
 		System.out.printf("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length);
 
@@ -535,18 +484,18 @@ public class Main{
 		if (ownVs[0].length == decompressedMatrix.length || ownValues == -1) {
 			System.out.println("O Erro Absoluto Médio é :: 0\n");
 		} else {
-			System.out.printf("O Erro Absoluto Médio é :: %.3f\n", avgAbsolutError(CSVtoMatrix(path), decompressedMatrix));
+			System.out.printf("O Erro Absoluto Médio é :: %.3f\n", avgAbsolutError(matrix, decompressedMatrix));
 		}
 	}
 
-	public static void doingFunctionOne(int ownValues, String path)
+	public static void doingFunctionOne(int ownValues, double[][] matrix)
 	{
 		double[][] 		decompressedMatrix;
 		double[][][] 	ownVs;
 
-		ownVs = Decomposition(ownValues, path);
+		ownVs = Decomposition(ownValues, matrix);
 		decompressedMatrix = calculateDecompressedMatrix(ownVs[0], ownVs[1]);
-		printDecomposition(ownVs, decompressedMatrix, ownValues,  path);
+		printDecomposition(ownVs, decompressedMatrix, ownValues, matrix);
 	}
 
 	//=========2=========//
