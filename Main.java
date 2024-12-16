@@ -8,9 +8,9 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class Main{
-	public static boolean hasOutputInFile = false;
-	public static String outputFilePath;
-	public static String pathWrite;
+	public static boolean			hasOutputInFile = false;
+	public static String			outputFilePath;
+	public static BufferedWriter	outputFile;;
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -32,14 +32,15 @@ public class Main{
 	// compilation == java -jar nome programa.jar -f X -k Y -i Z -d W
 	public static void NonIterative(String[] arguments)
 	{
-		int			type;
-		int			ownValues;
-		String		path;
-		String		dirPath;
+		int				type;
+		int				ownValues;
+		String			path;
+		String			dirPath;
+		String			pathWrite;
 
 		if (!arguments[0].equals("-f"))
 		{
-			outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+			System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
@@ -47,44 +48,68 @@ public class Main{
 			case 1:
 				if (!CheckingArgs(arguments, 1))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				path = arguments[5];
 				pathWrite = arguments[6];
-				System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
+					//function
+					outputFile.close();
+				}catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
 				break ;
 			case 2:
 				if (!CheckingArgs(arguments, 2))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				dirPath = arguments[5];
 				pathWrite = arguments[6];
-				System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					// function
+					System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
+					outputFile.close();
+				} catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
+
 				break ;
 			case 3:
 				if (!CheckingArgs(arguments, 3))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				path = arguments[5];
 				dirPath = arguments[7];
 				pathWrite = arguments[8];
-				System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					// function
+					System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
+					outputFile.close();
+				} catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
+
 				break ;
 			default:
 				outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
-				break;
-		}
+				return ;
+			}
+		return ;
 	}
 
 	public static boolean CheckingArgs(String[] arguments, int whichExec)
@@ -128,6 +153,7 @@ public class Main{
 		int			ownValues;
 		String		path;
 		String		dirPath;
+		String		pathWrite;
 
 		type = 1;
 		pathWrite = null;
@@ -216,15 +242,12 @@ public class Main{
 	//==============Output==============//
 	public static void outputFunction(String toPrint)
 	{
-		if (pathWrite == null)
+		if (outputFile == null)
 			System.out.printf("%s", toPrint);
 		else
 		{
-			BufferedWriter 	outputFile;
 			try {
-				outputFile = new BufferedWriter(new FileWriter(pathWrite));
 				outputFile.write(toPrint);
-				outputFile.close();
 			} catch (IOException e) {
 				outputFunction("Not possible to create the file!\n");
 			}
@@ -540,7 +563,7 @@ public class Main{
 	{
 		double[][]			reconstructionVector;
 
-	
+
 		double				averageAbsoluteError;
 		double[]			averageVector;
 		double[]			phi;
@@ -559,7 +582,7 @@ public class Main{
 
 		reconstructionVector = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
 		//averageAbsoluteError = avgAbsolutError(matrixInVector, reconstructionMatrix); BREAK
-		
+
 		//System.out.println(averageAbsoluteError); BREAK
 
 		printMatrix(reconstructionVector);
@@ -640,7 +663,7 @@ public class Main{
 		intermediaryMatrix = matrixMulti(matrix, matrixTranspose(matrix));
 		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
 
-		return covarianceMatrix;	
+		return covarianceMatrix;
 	}
 
 	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int precisionValues, double[] averageVector, double[][] allImagesInVector)
@@ -664,20 +687,20 @@ public class Main{
 		if(precisionValues < eigenVectorLength){
 			eigenVectorLength = precisionValues;
 		}
-		
-		for (int i = 0; i < allImagesInVector.length; i++) 
+
+		for (int i = 0; i < allImagesInVector.length; i++)
 		{
 			System.out.println(reconstructionMatrix[i].length); // 4096
 			System.out.println(eigenVectors[0].length); // 40
 			System.out.println(eigenVectorLength); // 40
 			System.out.println(allImagesInVector[0].length); //4096
 
-			for (int j = 0; j < eigenVectorLength; j++) 
-			{	
+			for (int j = 0; j < eigenVectorLength; j++)
+			{
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
-			
-			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]); 	
+
+			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]);
 		}
 
 
@@ -686,7 +709,7 @@ public class Main{
 	}
 
 	public static double[][] calculateAllWeights(double[][] allPhis, double[][] eigenVectors, double[][] allImagesVector){
-		
+
 		double[][] 		allWeights;
 
 
