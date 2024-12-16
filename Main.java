@@ -286,9 +286,6 @@ public class Main{
 		for (int i = 0; i < csvFiles.length; i++)
 			csvFiles[i] = String.join("/", dirPath, csvFiles[i]);
 
-//		for (int i = 0; i < csvFiles.length; i++) {
-//			System.out.println(csvFiles[i]);
-//		}
 		return (csvFiles);
 	}
 
@@ -458,7 +455,7 @@ public class Main{
 
 		RealMatrix 		eiganVectorsApache;
 		RealMatrix 		eiganValuesApache;
-		
+
 		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
 
 		eiganVectorsApache = eiganDecompositor.getD();
@@ -471,7 +468,7 @@ public class Main{
 
 		eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
 		eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
-		
+
 
 		if (own_values < totalNumberOfOwnValues && own_values != -1) {
 			numberValuesToRemove = totalNumberOfOwnValues - own_values;
@@ -516,7 +513,7 @@ public class Main{
 	public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues)
 	{
 		double[][] 		intermediaryMatrix;;
-		
+
 		intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
 
 		return matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
@@ -698,7 +695,7 @@ public class Main{
 		}
 
 		distance = Math.sqrt(distance);
-		
+
 		return distance;
 	}
 
@@ -717,7 +714,6 @@ public class Main{
 		}
 		return index;
 	}
-
 
 	public static void SearchClosest(int own_values, String csvPath, String dirPath)
 	{
@@ -944,7 +940,7 @@ public class Main{
 
 		BufferedWriter 	outputFile;
 		String 			line;
-		
+
 
 		height = matrix.length;
 		width = matrix[0].length;
@@ -1023,4 +1019,94 @@ public class Main{
 			}
 		}
 	}
+
+	//===================Testes Unitarios===================//
+	public static boolean matrixEquals(double[][] matrix1, double[][] matrix2)
+	{
+		if(matrix1.length != matrix2.length)
+			return (false);
+		if(matrix1[0].length != matrix2[0].length)
+			return (false);
+
+		for (int i = 0; i < matrix1.length; i++)
+		{
+			for (int k = 0; k < matrix1[i].length; k++)
+			{
+				if(matrix1[i][k] != matrix2[i][k])
+					return (false);
+			}
+		}
+		return (true);
+	}
+
+	public static boolean vectorEquals(double[] vector1, double[] vector2)
+	{
+		if(vector1.length != vector2.length)
+			return (false);
+
+		for (int i = 0; i < vector1.length; i++)
+		{
+			if(vector1[i] != vector2[i])
+				return (false);
+		}
+		return (true);
+	}
+
+	public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixAdd(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixMulti(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixDivConst(double[][] matrix1, double[][] expected, int value)
+	{
+
+		matrix1 = matrixMultiConst(matrix1, value);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixMultiConst(double[][] matrix1, double[][] expected, int value)
+	{
+
+		matrix1 = matrixMultiConst(matrix1, value);
+		return (matrixEquals(matrix1, expected));
+
+	}
+
+	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
+	{
+		matrix1 = matrixTranspose(matrix1);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
+	{
+		vector1 = vectorAdd(vector1, vector2);
+		return (vectorEquals(vector1,expected));
+	}
+
+	public static boolean testVectorMulti(double[] vector1, double[] vector2, double[] expected)
+	{
+		vector1 = vectorMulti(vector1, vector2);
+		return (vectorEquals(vector1,expected));
+	}
+
+	public static boolean testVectorDivConst(double[] vector1, double[] expected, int value)
+	{
+		vector1 = vectorMultiConst(vector1, value);
+		return (vectorEquals(vector1,expected));
+	}
+
+	public static boolean testVectorMultiConst(double[] vector1, double[] expected, int value)
+	{
+		vector1 = vectorMultiConst(vector1, 1);
+		return (vectorEquals(vector1,expected));
+	}
+
 }
