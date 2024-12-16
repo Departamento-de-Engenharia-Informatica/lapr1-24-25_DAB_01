@@ -39,7 +39,7 @@ public class Main{
 
 		if (!arguments[0].equals("-f"))
 		{
-			System.out.println("You've entered some wrong argument!! Check it and try again!!");
+			outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
@@ -47,7 +47,7 @@ public class Main{
 			case 1:
 				if (!CheckingArgs(arguments, 1))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 				ownValues = Integer.parseInt(arguments[3]);
@@ -59,7 +59,7 @@ public class Main{
 			case 2:
 				if (!CheckingArgs(arguments, 2))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 				ownValues = Integer.parseInt(arguments[3]);
@@ -71,7 +71,7 @@ public class Main{
 			case 3:
 				if (!CheckingArgs(arguments, 3))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 				ownValues = Integer.parseInt(arguments[3]);
@@ -82,7 +82,7 @@ public class Main{
 				// function
 				break ;
 			default:
-				System.out.println("You've entered some wrong argument!! Check it and try again!!");
+				outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 				break;
 		}
 	}
@@ -157,7 +157,7 @@ public class Main{
 					break;
 			}
 		}
-		System.out.println("Program ending... Thanks for using it!!");
+		outputFunction("Program ending... Thanks for using it!!\n");
 	}
 
 	public static int TypeOfExecution()
@@ -165,21 +165,21 @@ public class Main{
 		int	read;
 
 		read = 100;
-		System.out.println("----------------------------------");
-		System.out.println("|        Menu of execution      |");
-		System.out.println("----------------------------------");
+		outputFunction("----------------------------------\n");
+		outputFunction("|        Menu of execution      |\n");
+		outputFunction("----------------------------------\n");
 		System.out.print("|Enter the type of execution:   |\n");
-		System.out.println("|(0) Exit Program               |");
-		System.out.println("|(1) Decomposition of images    |");
-		System.out.println("|(2) Rebuild images             |");
-		System.out.println("|(3) Identify closest           |");
-		System.out.println("----------------------------------");
+		outputFunction("|(0) Exit Program               |\n");
+		outputFunction("|(1) Decomposition of images    |\n");
+		outputFunction("|(2) Rebuild images             |\n");
+		outputFunction("|(3) Identify closest           |\n");
+		outputFunction("----------------------------------\n");
 
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 		{
 			read = input.nextInt();
 			if (!(read <= 3 && read >= 0))
-				System.out.println("You've entered a wrong value. Try it again: ");
+				outputFunction("You've entered a wrong value. Try it again: \n");
 		}
 		return (read);
 	}
@@ -189,15 +189,15 @@ public class Main{
 		int	read;
 
 		read = MIN_OWN_VALUE - 1;
-		System.out.println("---------------------------------------------------------------");
+		outputFunction("---------------------------------------------------------------\n");
 		System.out.print("|Enter the number of own values that you want to use(columns):|\n");
-		System.out.println("---------------------------------------------------------------");
+		outputFunction("---------------------------------------------------------------\n");
 		while (read < MIN_OWN_VALUE)
 		{
 			read = input.nextInt();
 			input.nextLine();
 			if(read <= 0 && read != MIN_OWN_VALUE)
-				System.out.println("You need to enter a non zero positive number or <-1>. Try again!");
+				outputFunction("You need to enter a non zero positive number or <-1>. Try again!\n");
 		}
 		return read;
 	}
@@ -206,9 +206,9 @@ public class Main{
 	{
 		String	path;
 
-		System.out.println("-----------------------------------");
+		outputFunction("-----------------------------------\n");
 		System.out.printf("%s", searching);
-		System.out.println("-----------------------------------");
+		outputFunction("-----------------------------------\n");
 		path = input.nextLine();
 		return (path);
 	}
@@ -226,7 +226,7 @@ public class Main{
 				outputFile.write(toPrint);
 				outputFile.close();
 			} catch (IOException e) {
-				System.out.println("Not possible to create the file!");
+				outputFunction("Not possible to create the file!\n");
 			}
 		}
 	}
@@ -240,7 +240,7 @@ public class Main{
 		matrix = ReadingCsv(filename);
 		if (matrix == null)
 		{
-			System.out.println("File does not exist!");
+			outputFunction("File does not exist!\n");
 			return (null);
 		}
 		return (matrix);
@@ -280,6 +280,7 @@ public class Main{
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 			j++;
 		}
+		
 		return (toReturn);
 	}
 
@@ -507,17 +508,17 @@ public class Main{
 	{
 		System.out.printf("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length);
 
-		System.out.println("Matriz de vetores próprios::");
+		outputFunction("Matriz de vetores próprios::\n");
 		printMatrix(ownVs[0]);
 
-		System.out.println("Matriz de valores próprios::");
+		outputFunction("Matriz de valores próprios::\n");
 		printMatrix(ownVs[1]);
 
 		System.out.print("Matriz resultante da multiplicação das matrizes decompostas::\n");
 		printMatrix(decompressedMatrix);
 
 		if (ownVs[0].length == decompressedMatrix.length || ownValues == -1) {
-			System.out.println("O Erro Absoluto Médio é :: 0\n");
+			outputFunction("O Erro Absoluto Médio é :: 0\n");
 		} else {
 			System.out.printf("O Erro Absoluto Médio é :: %.3f\n", avgAbsolutError(matrix, decompressedMatrix));
 		}
@@ -549,7 +550,7 @@ public class Main{
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
 		mediumVector = CalculateMediumVector(matrixInVector);
 		covarianceMatrix = buildCovarianceMatrix(matrixInVector, mediumVector);
-		System.out.println();
+		outputFunction();
 		printMatrix(covarianceMatrix);
 		*/
 		VerticalVectorMatrix(ownValues, dirPath);
@@ -591,11 +592,11 @@ public class Main{
 			for (int j = 0; j < manyVectors; j++)
 				mediumVector[i] += allImgsInVector[j][i];
 		mediumVector = vectorDivConst(mediumVector, manyVectors);
-		/*System.out.println();
+		/*outputFunction();
 		for (int i = 0; i < vectorItens; i++)
 			System.out.printf("%.1f ",mediumVector[i]);
-		System.out.println();
-		System.out.println();*/
+		outputFunction();
+		outputFunction();*/
 		return (mediumVector);
 	}
 
@@ -625,11 +626,11 @@ public class Main{
 
 		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
 
-		System.out.println("A^t Matrix");
+		outputFunction("A^t Matrix\n");
 		//printMatrix(matrix);
 
 		intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix);
-		System.out.println("intermediaryMatrix");
+		outputFunction("intermediaryMatrix\n");
 
 		//printMatrix(intermediaryMatrix);
 		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
@@ -746,7 +747,7 @@ public class Main{
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 
-		System.out.println(indexOfMinEuclideanDistance);
+		outputFunction(indexOfMinEuclideanDistance+"");
 	}
 
 	//=============Matrix Operations=============//
@@ -938,14 +939,14 @@ public class Main{
 						line += ",";
 					}
 				}
-				System.out.println(line);
+				outputFunction(line);
 				outputFile.write(line);
 				outputFile.newLine();
 			}
 			outputFile.close();
 			return true;
 		} catch (IOException e) {
-			System.out.println("Not possible to create the file!");
+			outputFunction("Not possible to create the file!\n");
 			return false;
 		}
 	}
@@ -980,119 +981,4 @@ public class Main{
 		File outputFile = new File(outputFilePath);
 		ImageIO.write(image, "jpg", outputFile);
 	}
-
-	public static void displayOutput(String str)
-	{
-		BufferedWriter 	outputFile;
-
-		if(hasOutputInFile)
-			System.out.println(str);
-		else{
-			try {
-				outputFile = new BufferedWriter(new FileWriter(outputFilePath));
-
-				outputFile.write(str);
-				outputFile.newLine();
-
-				outputFile.close();
-
-			} catch (IOException e) {
-				// nao sei
-			}
-		}
-	}
-
-	//===================Testes Unitarios===================//
-	public static boolean matrixEquals(double[][] matrix1, double[][] matrix2)
-	{
-		if(matrix1.length != matrix2.length)
-			return (false);
-		if(matrix1[0].length != matrix2[0].length)
-			return (false);
-
-		for (int i = 0; i < matrix1.length; i++)
-		{
-			for (int k = 0; k < matrix1[i].length; k++)
-			{
-				if(matrix1[i][k] != matrix2[i][k])
-					return (false);
-			}
-		}
-		return (true);
-	}
-
-	public static boolean vectorEquals(double[] vector1, double[] vector2)
-	{
-		if(vector1.length != vector2.length)
-			return (false);
-
-		for (int i = 0; i < vector1.length; i++)
-		{
-			if(vector1[i] != vector2[i])
-				return (false);
-		}
-		return (true);
-	}
-
-	public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
-	{
-		matrix1 = matrixAdd(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
-	{
-		matrix1 = matrixMulti(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testMatrixDivConst(double[][] matrix1, double[][] expected, int value)
-	{
-
-		matrix1 = matrixMultiConst(matrix1, value);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testMatrixMultiConst(double[][] matrix1, double[][] expected, int value)
-	{
-
-		matrix1 = matrixMultiConst(matrix1, value);
-		return (matrixEquals(matrix1, expected));
-
-	}
-
-	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
-	{
-		matrix1 = matrixTranspose(matrix1);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
-	{
-		vector1 = vectorAdd(vector1, vector2);
-		return (vectorEquals(vector1,expected));
-	}
-
-	public static boolean testVectorMulti(double[] vector1, double[] vector2, double expected)
-	{
-		double	value;
-
-		value = vectorMulti(vector1, vector2);
-		if(value == expected)
-			return (true);
-		return (false);
-	}
-
-	public static boolean testVectorDivConst(double[] vector1, double[] expected, double value)
-	{
-		vector1 = vectorMultConst(vector1, value);
-		return (vectorEquals(vector1,expected));
-	}
-
-	public static boolean testVectorMultiConst(double[] vector1, double[] expected, double value)
-	{
-		vector1 = vectorMultConst(vector1, value);
-		return (vectorEquals(vector1,expected));
-	}
-
 }
