@@ -853,9 +853,6 @@ public class Main{
 			}
 		}
 
-//		System.out.println("------------------");
-//		for (int i = 0; i < verticalMatrix.length; i++)
-//				System.out.println(verticalMatrix[i]);
 		return verticalMatrix;
 	}
 
@@ -909,12 +906,13 @@ public class Main{
 	public static void printMatrix(double[][] matrix)
 	{
 		for (int rows = 0; rows < matrix.length; rows++) {
-			for (int columns = 0; columns < matrix[0].length; columns++) {
-				System.out.printf("%8.3f ", matrix[rows][columns]);
+			for (int columns = 0; columns < matrix[0].length; columns++)
+			{
+				outputFunction(matrix[rows][columns]+"  ");
 			}
-			System.out.println();
+			outputFunction("\n");
 		}
-		System.out.println();
+		outputFunction("\n");
 	}
 
 	public static boolean matrixToCSV(double[][] matrix, String outputPath)
