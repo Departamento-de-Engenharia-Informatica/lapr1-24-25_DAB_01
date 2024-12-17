@@ -571,9 +571,9 @@ public class Main{
 	//=========2=========//
 	public static void Recomposition(int precisionValues, String dirPath)
 	{
-		double[][]			reconstructionVector;
+		double[][]			reconstructionMatrix;
 
-
+	
 		double				averageAbsoluteError;
 		double[]			averageVector;
 		double[]			phi;
@@ -585,24 +585,17 @@ public class Main{
 
 
 		csvFilesInFolder = ReadingDir(dirPath);
-
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
-
-		if (matrixInVector == null)
-			return ;
-
 		averageVector = CalculateMediumVector(matrixInVector);
-
 		covarianceMatrix = buildCovarianceMatrix(matrixInVector, averageVector);
-
 		eigenVectors = Decomposition(precisionValues, covarianceMatrix)[0];
 
-		reconstructionVector = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
+		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
 		//averageAbsoluteError = avgAbsolutError(matrixInVector, reconstructionMatrix); BREAK
-
+		
 		//System.out.println(averageAbsoluteError); BREAK
 
-		printMatrix(reconstructionVector);
+		printMatrix(reconstructionMatrix);
 
 		//matrixToJPG(reconstructionMatrix, "/"); HOW WORK?!?!?!?!?!?!?!
 	}
@@ -625,12 +618,8 @@ public class Main{
 		fileLength = files.length;
 		allImgsInVector = new double[fileLength][];
 		for (int i = 0; i < fileLength; i++)
-		{
 			allImgsInVector[i] = MatrixToVerticalVector(CSVtoMatrix(files[i]));
-			if (allImgsInVector[i] == null)
-				return (null);
-		}
-			//printMatrix(allImgsInVector);
+		//printMatrix(allImgsInVector);
 		return (allImgsInVector);
 	}
 
@@ -678,13 +667,12 @@ public class Main{
 		double[][] 		matrix;
 		double[][] 		intermediaryMatrix;
 		double[][] 		covarianceMatrix;
-
+		
 		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
-
-		intermediaryMatrix = matrixMulti(matrix, matrixTranspose(matrix));
+		
+		intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix); // FAST WAY -> MATRIX * TRANSPOSE || SLOW WAY -> TRANSPOSE * MATRIX
 		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
-
-		return covarianceMatrix;
+		return covarianceMatrix;	
 	}
 
 	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int precisionValues, double[] averageVector, double[][] allImagesInVector)
@@ -705,32 +693,25 @@ public class Main{
 		eigenVectorLength = eigenVectors.length;
 
 		// falta check-1
-		if(precisionValues < eigenVectorLength){
+		if(precisionValues < eigenVectorLength && precisionValues != -1){
 			eigenVectorLength = precisionValues;
-		}
-
-		for (int i = 0; i < allImagesInVector.length; i++)
+		} 
+		
+		for (int i = 0; i < allImagesInVector.length; i++) 
 		{
-			System.out.println(reconstructionMatrix[i].length); // 4096
-			System.out.println(eigenVectors[0].length); // 40
-			System.out.println(eigenVectorLength); // 40
-			System.out.println(allImagesInVector[0].length); //4096
-
-			for (int j = 0; j < eigenVectorLength; j++)
-			{
+			for (int j = 0; j < eigenVectorLength; j++) 
+			{	
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
-
-			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]);
+			
+			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]); 	
 		}
 
-
-		printMatrix(reconstructionMatrix);
 		return reconstructionMatrix;
 	}
 
 	public static double[][] calculateAllWeights(double[][] allPhis, double[][] eigenVectors, double[][] allImagesVector){
-
+		
 		double[][] 		allWeights;
 
 
@@ -742,6 +723,7 @@ public class Main{
 
 		return allWeights;
 	}
+
 
 	//=========3=========//
 	public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
@@ -976,14 +958,26 @@ public class Main{
 
 	public static double[] vectorAdd(double[] vector1, double[] vector2)
 	{
-		int		 vectorLen;
+		int		 vectorLen1;
+		int 	 vectorLen2;
 
 		double[] addedVector;
 
-		vectorLen = vector1.length;
-		addedVector = new double[vectorLen];
+		vectorLen1 = vector1.length;
+		vectorLen2 = vector2.length;
 
-		for (int i = 0; i < vectorLen; i++)
+		addedVector = new double[vectorLen1];
+
+
+		if(vectorLen1 != vectorLen2)
+		{
+			System.out.println("Vectores de tamanhos diferentes soma impossível!");
+			System.out.printf("Tamanho do vetor 1: %d Tamanho do vetor 2: %d\n", vectorLen1, vectorLen2);
+
+			return null;
+		}
+
+		for (int i = 0; i < vectorLen1; i++)
 			addedVector[i] = vector1[i] + vector2[i];
 		return (addedVector);
 	}
