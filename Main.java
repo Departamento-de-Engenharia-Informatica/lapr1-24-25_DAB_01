@@ -600,7 +600,7 @@ public class Main{
 		csvFilesInFolder = ReadingDir(dirPath);
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
 		averageVector = CalculateMediumVector(matrixInVector);
-		covarianceMatrix = buildCovarianceMatrix(matrixInVector, averageVector);
+		covarianceMatrix = buildReverseCovarianceMatrix(matrixInVector, averageVector);
 		eigenVectors = Decomposition(precisionValues, covarianceMatrix)[0];
 
 		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
@@ -675,17 +675,56 @@ public class Main{
 		return matrix;
 	}
 
-	public static double[][] buildCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
+	public static double[][] buildReverseCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
 	{
 		double[][] 		matrix;
-		double[][] 		intermediaryMatrix;
-		double[][] 		covarianceMatrix;
+		double[][] 		reverseCovarianceMatrix;
 
 		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
 
-		intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix); // FAST WAY -> MATRIX * TRANSPOSE || SLOW WAY -> TRANSPOSE * MATRIX
-		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
-		return covarianceMatrix;
+		reverseCovarianceMatrix = matrixMulti(matrix, matrixTranspose(matrix));
+
+		return reverseCovarianceMatrix;
+	}
+
+	public static double[][] getEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allImagesMatrix, double[] mediumVector,int ownValues){
+
+		double[][][]		decomposedReverseCovarianceMatrix;
+		double[][]			eigenVectorsOfReverseCovarianceMatrix;
+		double[][]			eigenVectorsOfCovarianceMatrix;
+		double[][]			allPhis;
+
+		decomposedReverseCovarianceMatrix = Decomposition(ownValues, reverseCovarianceMatrix);
+		eigenVectorsOfReverseCovarianceMatrix = decomposedReverseCovarianceMatrix[0];
+
+		allPhis = calculateAllPhis(allImagesMatrix, mediumVector);
+
+		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
+
+
+		eigenVectorsOfCovarianceMatrix = matrixTranspose(eigenVectorsOfCovarianceMatrix);
+
+
+		for (int i = 0; i < eigenVectorsOfCovarianceMatrix.length; i++) {
+			eigenVectorsOfCovarianceMatrix[i] = normalizeVector(eigenVectorsOfCovarianceMatrix[i]);
+		}
+
+		return eigenVectorsOfCovarianceMatrix;
+	}
+
+	public static double[] normalizeVector(double[] vector){
+
+		return vectorDivConst(vector, getVectorNorm(vector));
+	}
+
+	public static double getVectorNorm(double[] vector){
+		double		sum;
+
+		sum = 0;
+		for (int i = 0; i < vector.length; i++) {
+			sum += Math.pow(vector[i], 2);
+		}
+		return Math.sqrt(sum);
 	}
 
 	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int precisionValues, double[] averageVector, double[][] allImagesInVector)
