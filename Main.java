@@ -10,7 +10,15 @@ import java.awt.image.BufferedImage;
 public class Main{
 	public static boolean			hasOutputInFile = false;
 	public static String			outputFilePath;
-	public static BufferedWriter	outputFile;;
+	public static BufferedWriter	outputFile;
+
+	//=======new values=====//
+	public static final int FUNC_1 = 1;
+	public static final int FUNC_2 = 2;
+	public static final int FUNC_3 = 3;
+	public static final int MAX_SIZE_IMG = 256;
+	public static final int MAX_VALUE_IN_CSV = 255;
+
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -40,7 +48,7 @@ public class Main{
 
 		if (!arguments[0].equals("-f"))
 		{
-			System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
+			outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
@@ -153,10 +161,9 @@ public class Main{
 		int			ownValues;
 		String		path;
 		String		dirPath;
-		String		pathWrite;
 
 		type = 1;
-		pathWrite = null;
+		outputFile = null;
 		while(type != 0)
 		{
 			type = TypeOfExecution();
@@ -169,7 +176,11 @@ public class Main{
 
 					path = GetPath("|Enter the file PATH of execution:|\n");
 					matrix = CSVtoMatrix(path);
-
+					if(matrix == null)
+					{
+						outputFunction("You've entered a bad csv file \n");
+						return ;
+					}
 					doingFunctionOne(ownValues, matrix);
 					break;
 				case 2:
@@ -254,7 +265,6 @@ public class Main{
 		}
 	}
 
-
 	//=========Matrix Read=========//
 	public static double[][] CSVtoMatrix(String filename)
 	{
@@ -268,6 +278,7 @@ public class Main{
 		}
 		return (matrix);
 	}
+
 
 	// Return (the double matrix) if it has something in the file, (null) if it has nothing
 	public static double[][] ReadingCsv(String filename)
@@ -558,7 +569,6 @@ public class Main{
 	}
 
 	//=========2=========//
-	//=========2=========//
 	public static void Recomposition(int precisionValues, String dirPath)
 	{
 		double[][]			reconstructionVector;
@@ -575,9 +585,16 @@ public class Main{
 
 
 		csvFilesInFolder = ReadingDir(dirPath);
+
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
+
+		if (matrixInVector == null)
+			return ;
+
 		averageVector = CalculateMediumVector(matrixInVector);
+
 		covarianceMatrix = buildCovarianceMatrix(matrixInVector, averageVector);
+
 		eigenVectors = Decomposition(precisionValues, covarianceMatrix)[0];
 
 		reconstructionVector = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
@@ -608,8 +625,12 @@ public class Main{
 		fileLength = files.length;
 		allImgsInVector = new double[fileLength][];
 		for (int i = 0; i < fileLength; i++)
+		{
 			allImgsInVector[i] = MatrixToVerticalVector(CSVtoMatrix(files[i]));
-		//printMatrix(allImgsInVector);
+			if (allImgsInVector[i] == null)
+				return (null);
+		}
+			//printMatrix(allImgsInVector);
 		return (allImgsInVector);
 	}
 
@@ -722,22 +743,20 @@ public class Main{
 		return allWeights;
 	}
 
-
-
 	//=========3=========//
-    public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
-        double[] 		weights;
+	public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
+		double[] 		weights;
 
-        weights = new double[eigenVectors.length];
+		weights = new double[eigenVectors.length];
 
 		eigenVectors = matrixTranspose(eigenVectors);
 
-        for (int i = 0; i < eigenVectors.length; i++) {
-            weights[i] = vectorMulti(eigenVectors[i],phi);
-        }
+		for (int i = 0; i < eigenVectors.length; i++) {
+			weights[i] = vectorMulti(eigenVectors[i],phi);
+		}
 
-        return weights;
-    }
+		return weights;
+	}
 
     public static double[] calculateNewPhi(String csvPath, double[] mediumVector){
         double[][] 		imageMatrix;
@@ -745,6 +764,8 @@ public class Main{
         double[] 		imageVector;
 
         imageMatrix = CSVtoMatrix(csvPath);
+		if(imageMatrix == null)
+			return (null);
 
         imageVector = MatrixToVerticalVector(imageMatrix);
 
@@ -809,9 +830,14 @@ public class Main{
 
         files = ReadingDir(dirPath);
         allImagesVector = AllImgsInVector(files);
+		if(allImagesVector == null)
+			return ;
+
         mediumVector = CalculateMediumVector(allImagesVector);
 
         newPhi = calculateNewPhi(csvPath, mediumVector);
+		if(newPhi == null)
+			return ;
 
         covarianceMatrix = buildCovarianceMatrix(allImagesVector, mediumVector);
         decomposedCovarianceMatrix = Decomposition(own_values, covarianceMatrix);
@@ -834,7 +860,7 @@ public class Main{
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 
-		outputFunction(indexOfMinEuclideanDistance+"");
+		outputFunction(indexOfMinEuclideanDistance+"\n");
 	}
 
 	//=============Matrix Operations=============//
@@ -873,7 +899,6 @@ public class Main{
 		}
 		return (matrixResult);
 	}
-
 
 	public static double[][] matrixDivConst(double[][] matrix1, int value)
 	{
@@ -925,12 +950,18 @@ public class Main{
 	//=============Vector Operations=============//
 	public static double[] MatrixToVerticalVector(double[][] matrix)
 	{
-		int 	 columnNumber = matrix.length;
-		int 	 rowNumber = matrix.length;
-		int 	 numberOfElements = (columnNumber * rowNumber);
-		double[] verticalMatrix = new double[numberOfElements];
+		int 	 columnNumber;
+		int 	 rowNumber;
+		int 	 numberOfElements;
+		double[] verticalMatrix;
 		int 	 index = 0;
 
+		if(matrix == null)
+			return (null);
+		columnNumber = matrix.length;
+		rowNumber = matrix.length;
+		numberOfElements = (columnNumber * rowNumber);
+		verticalMatrix = new double[numberOfElements];
 		for (int i = 0; i < rowNumber; i++)
 		{
 			for (int j = 0; j < columnNumber; j++)
