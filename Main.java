@@ -918,9 +918,10 @@ public class Main{
 
 	public static double[][] vectorToMatrix(double[] vector){
 		int matrixSidesLen;
-		double[][] matrix = new double[matrixSidesLen][matrixSidesLen];
-		
+
 		matrixSidesLen = (int) Math.sqrt(vector.length);
+
+		double[][] matrix = new double[matrixSidesLen][matrixSidesLen];
 
 		int columnOffset = 0;
 		for(int i = 0; i < matrixSidesLen; i++){
