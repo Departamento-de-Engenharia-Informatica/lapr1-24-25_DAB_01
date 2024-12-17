@@ -8,9 +8,17 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 public class Main{
-	public static boolean hasOutputInFile = false;
-	public static String outputFilePath;
-	public static String pathWrite;
+	public static boolean			hasOutputInFile = false;
+	public static String			outputFilePath;
+	public static BufferedWriter	outputFile;
+
+	//=======new values=====//
+	public static final int FUNC_1 = 1;
+	public static final int FUNC_2 = 2;
+	public static final int FUNC_3 = 3;
+	public static final int MAX_SIZE_IMG = 256;
+	public static final int MAX_VALUE_IN_CSV = 255;
+
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -32,10 +40,11 @@ public class Main{
 	// compilation == java -jar nome programa.jar -f X -k Y -i Z -d W
 	public static void NonIterative(String[] arguments)
 	{
-		int			type;
-		int			ownValues;
-		String		path;
-		String		dirPath;
+		int				type;
+		int				ownValues;
+		String			path;
+		String			dirPath;
+		String			pathWrite;
 
 		if (!arguments[0].equals("-f"))
 		{
@@ -47,44 +56,68 @@ public class Main{
 			case 1:
 				if (!CheckingArgs(arguments, 1))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				path = arguments[5];
 				pathWrite = arguments[6];
-				System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
+					//function
+					outputFile.close();
+				}catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
 				break ;
 			case 2:
 				if (!CheckingArgs(arguments, 2))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				dirPath = arguments[5];
 				pathWrite = arguments[6];
-				System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					// function
+					System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
+					outputFile.close();
+				} catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
+
 				break ;
 			case 3:
 				if (!CheckingArgs(arguments, 3))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
+
 				ownValues = Integer.parseInt(arguments[3]);
 				path = arguments[5];
 				dirPath = arguments[7];
 				pathWrite = arguments[8];
-				System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
-				// function
+				try{
+					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					// function
+					System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
+					outputFile.close();
+				} catch (IOException e) {
+					System.out.println("Not possible to write");
+				}
+
 				break ;
 			default:
 				outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
-				break;
-		}
+				return ;
+			}
+		return ;
 	}
 
 	public static boolean CheckingArgs(String[] arguments, int whichExec)
@@ -130,7 +163,7 @@ public class Main{
 		String		dirPath;
 
 		type = 1;
-		pathWrite = null;
+		outputFile = null;
 		while(type != 0)
 		{
 			type = TypeOfExecution();
@@ -143,7 +176,11 @@ public class Main{
 
 					path = GetPath("|Enter the file PATH of execution:|\n");
 					matrix = CSVtoMatrix(path);
-
+					if(matrix == null)
+					{
+						outputFunction("You've entered a bad csv file \n");
+						return ;
+					}
 					doingFunctionOne(ownValues, matrix);
 					break;
 				case 2:
@@ -216,21 +253,17 @@ public class Main{
 	//==============Output==============//
 	public static void outputFunction(String toPrint)
 	{
-		if (pathWrite == null)
+		if (outputFile == null)
 			System.out.printf("%s", toPrint);
 		else
 		{
-			BufferedWriter 	outputFile;
 			try {
-				outputFile = new BufferedWriter(new FileWriter(pathWrite));
 				outputFile.write(toPrint);
-				outputFile.close();
 			} catch (IOException e) {
 				outputFunction("Not possible to create the file!\n");
 			}
 		}
 	}
-
 
 	//=========Matrix Read=========//
 	public static double[][] CSVtoMatrix(String filename)
@@ -245,6 +278,7 @@ public class Main{
 		}
 		return (matrix);
 	}
+
 
 	// Return (the double matrix) if it has something in the file, (null) if it has nothing
 	public static double[][] ReadingCsv(String filename)
@@ -535,10 +569,9 @@ public class Main{
 	}
 
 	//=========2=========//
-	//=========2=========//
 	public static void Recomposition(int precisionValues, String dirPath)
 	{
-		double[][]			reconstructionVector;
+		double[][]			reconstructionMatrix;
 
 	
 		double				averageAbsoluteError;
@@ -557,12 +590,12 @@ public class Main{
 		covarianceMatrix = buildCovarianceMatrix(matrixInVector, averageVector);
 		eigenVectors = Decomposition(precisionValues, covarianceMatrix)[0];
 
-		reconstructionVector = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
+		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
 		//averageAbsoluteError = avgAbsolutError(matrixInVector, reconstructionMatrix); BREAK
 		
 		//System.out.println(averageAbsoluteError); BREAK
 
-		printMatrix(reconstructionVector);
+		printMatrix(reconstructionMatrix);
 
 		//matrixToJPG(reconstructionMatrix, "/"); HOW WORK?!?!?!?!?!?!?!
 	}
@@ -634,12 +667,11 @@ public class Main{
 		double[][] 		matrix;
 		double[][] 		intermediaryMatrix;
 		double[][] 		covarianceMatrix;
-
+		
 		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
-
-		intermediaryMatrix = matrixMulti(matrix, matrixTranspose(matrix));
+		
+		intermediaryMatrix = matrixMulti(matrixTranspose(matrix), matrix); // FAST WAY -> MATRIX * TRANSPOSE || SLOW WAY -> TRANSPOSE * MATRIX
 		covarianceMatrix = matrixDivConst(intermediaryMatrix, allImagesMatrix.length);
-
 		return covarianceMatrix;	
 	}
 
@@ -661,17 +693,12 @@ public class Main{
 		eigenVectorLength = eigenVectors.length;
 
 		// falta check-1
-		if(precisionValues < eigenVectorLength){
+		if(precisionValues < eigenVectorLength && precisionValues != -1){
 			eigenVectorLength = precisionValues;
-		}
+		} 
 		
 		for (int i = 0; i < allImagesInVector.length; i++) 
 		{
-			System.out.println(reconstructionMatrix[i].length); // 4096
-			System.out.println(eigenVectors[0].length); // 40
-			System.out.println(eigenVectorLength); // 40
-			System.out.println(allImagesInVector[0].length); //4096
-
 			for (int j = 0; j < eigenVectorLength; j++) 
 			{	
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
@@ -680,8 +707,6 @@ public class Main{
 			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]); 	
 		}
 
-
-		printMatrix(reconstructionMatrix);
 		return reconstructionMatrix;
 	}
 
@@ -700,21 +725,20 @@ public class Main{
 	}
 
 
-
 	//=========3=========//
-    public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
-        double[] 		weights;
+	public static double[] calculateWeights(double[][] eigenVectors, double[] phi){
+		double[] 		weights;
 
-        weights = new double[eigenVectors.length];
+		weights = new double[eigenVectors.length];
 
 		eigenVectors = matrixTranspose(eigenVectors);
 
-        for (int i = 0; i < eigenVectors.length; i++) {
-            weights[i] = vectorMulti(eigenVectors[i],phi);
-        }
+		for (int i = 0; i < eigenVectors.length; i++) {
+			weights[i] = vectorMulti(eigenVectors[i],phi);
+		}
 
-        return weights;
-    }
+		return weights;
+	}
 
     public static double[] calculateNewPhi(String csvPath, double[] mediumVector){
         double[][] 		imageMatrix;
@@ -722,6 +746,8 @@ public class Main{
         double[] 		imageVector;
 
         imageMatrix = CSVtoMatrix(csvPath);
+		if(imageMatrix == null)
+			return (null);
 
         imageVector = MatrixToVerticalVector(imageMatrix);
 
@@ -786,9 +812,14 @@ public class Main{
 
         files = ReadingDir(dirPath);
         allImagesVector = AllImgsInVector(files);
+		if(allImagesVector == null)
+			return ;
+
         mediumVector = CalculateMediumVector(allImagesVector);
 
         newPhi = calculateNewPhi(csvPath, mediumVector);
+		if(newPhi == null)
+			return ;
 
         covarianceMatrix = buildCovarianceMatrix(allImagesVector, mediumVector);
         decomposedCovarianceMatrix = Decomposition(own_values, covarianceMatrix);
@@ -811,7 +842,7 @@ public class Main{
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 
-		outputFunction(indexOfMinEuclideanDistance+"");
+		outputFunction(indexOfMinEuclideanDistance+"\n");
 	}
 
 	//=============Matrix Operations=============//
@@ -850,7 +881,6 @@ public class Main{
 		}
 		return (matrixResult);
 	}
-
 
 	public static double[][] matrixDivConst(double[][] matrix1, int value)
 	{
@@ -902,12 +932,18 @@ public class Main{
 	//=============Vector Operations=============//
 	public static double[] MatrixToVerticalVector(double[][] matrix)
 	{
-		int 	 columnNumber = matrix.length;
-		int 	 rowNumber = matrix.length;
-		int 	 numberOfElements = (columnNumber * rowNumber);
-		double[] verticalMatrix = new double[numberOfElements];
+		int 	 columnNumber;
+		int 	 rowNumber;
+		int 	 numberOfElements;
+		double[] verticalMatrix;
 		int 	 index = 0;
 
+		if(matrix == null)
+			return (null);
+		columnNumber = matrix.length;
+		rowNumber = matrix.length;
+		numberOfElements = (columnNumber * rowNumber);
+		verticalMatrix = new double[numberOfElements];
 		for (int i = 0; i < rowNumber; i++)
 		{
 			for (int j = 0; j < columnNumber; j++)
@@ -922,14 +958,26 @@ public class Main{
 
 	public static double[] vectorAdd(double[] vector1, double[] vector2)
 	{
-		int		 vectorLen;
+		int		 vectorLen1;
+		int 	 vectorLen2;
 
 		double[] addedVector;
 
-		vectorLen = vector1.length;
-		addedVector = new double[vectorLen];
+		vectorLen1 = vector1.length;
+		vectorLen2 = vector2.length;
 
-		for (int i = 0; i < vectorLen; i++)
+		addedVector = new double[vectorLen1];
+
+
+		if(vectorLen1 != vectorLen2)
+		{
+			System.out.println("Vectores de tamanhos diferentes soma impossível!");
+			System.out.printf("Tamanho do vetor 1: %d Tamanho do vetor 2: %d\n", vectorLen1, vectorLen2);
+
+			return null;
+		}
+
+		for (int i = 0; i < vectorLen1; i++)
 			addedVector[i] = vector1[i] + vector2[i];
 		return (addedVector);
 	}
