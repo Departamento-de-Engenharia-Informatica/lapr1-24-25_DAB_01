@@ -892,7 +892,7 @@ public class Main{
 		if(newPhi == null)
 			return ;
 
-		covarianceMatrix = buildCovarianceMatrix(allImagesVector, mediumVector);
+		covarianceMatrix = buildReverseCovarianceMatrix(allImagesVector, mediumVector);
 
 		decomposedCovarianceMatrix = Decomposition(own_values, covarianceMatrix);
 
@@ -914,6 +914,23 @@ public class Main{
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 		outputsThirdFuncionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights);
+	}
+
+	public static double[][] vectorToMatrix(double[] vector){
+		int matrixSidesLen;
+		double[][] matrix = new double[matrixSidesLen][matrixSidesLen];
+		
+		matrixSidesLen = (int) Math.sqrt(vector.length);
+
+		int columnOffset = 0;
+		for(int i = 0; i < matrixSidesLen; i++){
+			for(int j = 0; j < matrixSidesLen; j++){
+				matrix[j][i] = vector[columnOffset+j];
+			}
+			columnOffset += matrixSidesLen;
+		}
+
+		return matrix;
 	}
 
 	//=============Matrix Operations=============//
