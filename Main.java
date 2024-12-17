@@ -557,8 +557,8 @@ public class Main{
 				decompressedMatrix[i][j] = Math.round(decompressedMatrix[i][j]);
 
 		printMatrix(decompressedMatrix);
-
-		if (ownVs[0].length == decompressedMatrix.length || ownValues == -1) {
+		
+		if (ownVs[0][0].length == decompressedMatrix.length || ownValues == -1) {
 			outputFunction("O Erro Absoluto Médio é :: 0\n");
 		} else {
 			outputFunction("O Erro Absoluto Médio é :: " + avgAbsolutError(matrix, decompressedMatrix) + "\n");
@@ -841,7 +841,7 @@ public class Main{
 		return index;
 	}
 
-	public static void outputsThirdFuncionality(String csvPath, String[] files, int own_values, double[] allEuclideanDistances, int indexOfMinEuclideanDistance, double[] newWeights)
+	public static void outputsThirdFuncionality(String csvPath, String[] files, int own_values, double[] allEuclideanDistances, int indexOfMinEuclideanDistance, double[] newWeights, double[][] allWeights)
 	{
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|             Output from functionality 3:             |");
@@ -851,6 +851,12 @@ public class Main{
 
 		outputFunction("\n\nOmega new vector:\n");
 		printVector(newWeights);
+
+		outputFunction("\n\nAll weights:\n");
+		for(int i = 0; i < allWeights.length; i++){
+			outputFunction(files[i]+":\t");
+			printVector(allWeights[i]);
+		}
 
 		outputFunction("\n\nEuclidian Distances between images:\n");
 		for (int i = 0; i < allEuclideanDistances.length; i++)
@@ -913,7 +919,7 @@ public class Main{
 		}
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
-		outputsThirdFuncionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights);
+		outputsThirdFuncionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights, allWeights);
 	}
 
 	public static double[][] vectorToMatrix(double[] vector){
@@ -1097,7 +1103,7 @@ public class Main{
 		for (int rows = 0; rows < matrix.length; rows++) {
 			for (int columns = 0; columns < matrix[0].length; columns++)
 			{
-				outputFunction(matrix[rows][columns]+"  ");
+				outputFunction(String.format("%.2f ", matrix[rows][columns]));
 			}
 			outputFunction("\n");
 		}
@@ -1107,7 +1113,7 @@ public class Main{
 	public static void printVector(double[] vector)
 	{
 		for (int i = 0; i < vector.length; i++) {
-			outputFunction(vector[i] + ", ");
+			outputFunction(String.format("%.2f ", vector[i]));
 		}
 		outputFunction("\n");
 	}
@@ -1162,8 +1168,8 @@ public class Main{
 		// Set the pixel intensities
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				int intensity = (int) matrix[y][x];
-				if (intensity < 0 || intensity > 255) {
+				int intensity = (int) Math.round(matrix[y][x]);
+				if (intensity < MIN_VALUE_IN_CSV || intensity > MAX_VALUE_IN_CSV) {
 					throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
 				}
 				int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
