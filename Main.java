@@ -591,7 +591,7 @@ public class Main{
 		double[]			averageVector;
 		double[]			phi;
 		double[][]			matrixInVector;
-		double[][]			covarianceMatrix;
+		double[][]			reverseCovarianceMatrix;
 		double[][]			eigenVectors;
 		String[]			PathToCompare;
 		String[]			csvFilesInFolder;
@@ -600,17 +600,19 @@ public class Main{
 		csvFilesInFolder = ReadingDir(dirPath);
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
 		averageVector = CalculateMediumVector(matrixInVector);
-		covarianceMatrix = buildReverseCovarianceMatrix(matrixInVector, averageVector);
-		eigenVectors = Decomposition(precisionValues, covarianceMatrix)[0];
-
+		reverseCovarianceMatrix = buildReverseCovarianceMatrix(matrixInVector, averageVector);
+		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, matrixInVector, averageVector, precisionValues);
 		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
-		//averageAbsoluteError = avgAbsolutError(matrixInVector, reconstructionMatrix); BREAK
 
-		//System.out.println(averageAbsoluteError); BREAK
+	for(int i = 0; i < reconstructionMatrix.length; i++){
+		try{
+			matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format("Output/img%d.jpg", i));
+		}catch (IOException e){
 
+		}
+	}
 		printMatrix(reconstructionMatrix);
 
-		//matrixToJPG(reconstructionMatrix, "/"); HOW WORK?!?!?!?!?!?!?!
 	}
 
 	public static void VerticalVectorMatrix(int OwnValues, String dirPath)
@@ -661,18 +663,17 @@ public class Main{
 		int 			height;
 		int 			width;
 		double[][] 		matrix;
+		double[]		adjustedMediumVector;
 
 		height = allImagesMatrix.length;
 		width = allImagesMatrix[0].length;
 		matrix = new double[height][width];
 
-		mediumVector = vectorMultConst(mediumVector, -1);
+		adjustedMediumVector = vectorMultConst(mediumVector, -1);
 		for(int imgIndex = 0; imgIndex < height; imgIndex++)
-			matrix[imgIndex] = vectorAdd(allImagesMatrix[imgIndex], mediumVector);
+			matrix[imgIndex] = vectorAdd(allImagesMatrix[imgIndex], adjustedMediumVector);
 
-		mediumVector = vectorMultConst(mediumVector, -1);
-
-		return matrix;
+        return matrix;
 	}
 
 	public static double[][] buildReverseCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
@@ -724,6 +725,9 @@ public class Main{
 		for (int i = 0; i < vector.length; i++) {
 			sum += Math.pow(vector[i], 2);
 		}
+		if (sum == 0){
+			return 0;
+		}
 		return Math.sqrt(sum);
 	}
 
@@ -739,25 +743,31 @@ public class Main{
 
 		allPhis = calculateAllPhis(allImagesInVector, averageVector);
 		allWeights = calculateAllWeights(allPhis, eigenVectors, allImagesInVector);
-		eigenVectors = matrixTranspose(eigenVectors);
+
+
 
 
 		eigenVectorLength = eigenVectors.length;
+//		System.out.println("EIGEN VECTORS");
+//		printMatrix(eigenVectors);
+//		System.out.println(eigenVectorLength);
 
-		// falta check-1
 		if(precisionValues < eigenVectorLength && precisionValues != -1){
 			eigenVectorLength = precisionValues;
 		}
 
-		for (int i = 0; i < allImagesInVector.length; i++)
-		{
-			for (int j = 0; j < eigenVectorLength; j++)
-			{
+
+
+        for (int i = 0; i < allImagesInVector.length; i++) {
+			for (int j = 0; j < eigenVectorLength; j++) {
+				System.out.println(eigenVectors[j][i]);
+				System.out.println(allWeights[i][j]);
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
-
-			reconstructionMatrix[i] =  vectorAdd(averageVector, reconstructionMatrix[i]);
+			reconstructionMatrix[i] = vectorAdd(reconstructionMatrix[i], averageVector);
 		}
+
+
 
 		return reconstructionMatrix;
 	}
@@ -767,7 +777,7 @@ public class Main{
 		double[][] 		allWeights;
 
 
-		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
+		allWeights = new double[allImagesVector.length][eigenVectors.length];
 
 		for (int i = 0; i < allImagesVector.length; i++) {
 			allWeights[i] = calculateWeights(eigenVectors, allPhis[i]);
@@ -781,8 +791,6 @@ public class Main{
 		double[] 		weights;
 
 		weights = new double[eigenVectors.length];
-
-		eigenVectors = matrixTranspose(eigenVectors);
 
 		for (int i = 0; i < eigenVectors.length; i++) {
 			weights[i] = vectorMulti(eigenVectors[i],phi);
@@ -878,7 +886,7 @@ public class Main{
 		double[] 		newPhi;
 
         double[][] 		covarianceMatrix;
-        double[][][] 	decomposedCovarianceMatrix;
+        double[][]		eiganVectors;
 
 		double[] 		newWeights;
 		double[][] 		allPhis;
@@ -900,9 +908,9 @@ public class Main{
 
 		covarianceMatrix = buildReverseCovarianceMatrix(allImagesVector, mediumVector);
 
-		decomposedCovarianceMatrix = Decomposition(own_values, covarianceMatrix);
+		eiganVectors = getEigenVectorsOfCovarianceMatrix(covarianceMatrix, allImagesVector, mediumVector, own_values);
 
-		newWeights = calculateWeights(decomposedCovarianceMatrix[0], newPhi);
+		newWeights = calculateWeights(eiganVectors, newPhi);
 
 		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
@@ -911,7 +919,7 @@ public class Main{
 		allEuclideanDistances = new double[allWeights.length];
 
 		for (int i = 0; i < allImagesVector.length; i++) {
-			allWeights[i] = calculateWeights(decomposedCovarianceMatrix[0],allPhis[i]);
+			allWeights[i] = calculateWeights(eiganVectors,allPhis[i]);
 		}
 
 		for (int i = 0; i < allEuclideanDistances.length; i++) {
@@ -1060,6 +1068,11 @@ public class Main{
 		vectorLen = vector1.length;
 		addedVector = new double[vectorLen];
 
+		if(vector1.length != vector2.length){
+			System.out.println("NAO PODE");
+			System.exit(0);
+		}
+
 		for (int i = 0; i < vectorLen; i++)
 			addedVector[i] = vector1[i] + vector2[i];
 		return (addedVector);
@@ -1090,11 +1103,13 @@ public class Main{
 	public static double[] vectorMultConst(double[] vector1, double value)
 	{
 		int			vectorLen;
+		double[]	multipliedVector;
 
 		vectorLen = vector1.length;
+		multipliedVector = new double[vectorLen];
 		for (int i = 0; i < vectorLen; i++)
-			vector1[i] = vector1[i] * value;
-		return (vector1);
+			multipliedVector[i] = vector1[i] * value;
+		return (multipliedVector);
 	}
 
 	//=============Display Matrix=============//
@@ -1104,8 +1119,13 @@ public class Main{
 			for (int columns = 0; columns < matrix[0].length; columns++)
 			{
 				outputFunction(String.format("%.2f ", matrix[rows][columns]));
-			}
+            }
 			outputFunction("\n");
+//			try{
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				throw new RuntimeException(e);
+//			}
 		}
 		outputFunction("\n");
 	}
@@ -1169,8 +1189,11 @@ public class Main{
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int intensity = (int) Math.round(matrix[y][x]);
-				if (intensity < MIN_VALUE_IN_CSV || intensity > MAX_VALUE_IN_CSV) {
-					throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
+				if (intensity < MIN_VALUE_IN_CSV ) {
+					intensity = 0;
+					//throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
+				}else if (intensity > MAX_VALUE_IN_CSV){
+					intensity = 255;
 				}
 				int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
 				image.setRGB(x, y, rgb);
