@@ -1,7 +1,6 @@
 
 import	java.util.Scanner;
 import java.io.*;
-import	java.lang.Object;
 
 import org.apache.commons.math3.linear.*;
 import javax.imageio.ImageIO;
@@ -32,16 +31,16 @@ public class Main{
 	public static void main(String[] args)
 	{
 		if (args.length > 0)
-			NonIterative(args);
+			nonInteractive(args);
 		else
-			Iterative();
+			interactive();
 
 		input.close();
 	}
 
 	//===========Non-Iterative exec and reading===========//
 	// compilation == java -jar nome programa.jar -f X -k Y -i Z -d W
-	public static void NonIterative(String[] arguments)
+	public static void nonInteractive(String[] arguments)
 	{
 		int				type;
 		int				ownValues;
@@ -68,7 +67,7 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
-					Decomposition(ownValues, CSVtoMatrix(path));
+					doingFunctionOne(ownValues, CSVtoMatrix(path));
 					outputFile.close();
 				}catch (IOException e) {
 					System.out.println("Not possible to write, closing program!");
@@ -155,7 +154,7 @@ public class Main{
 	}
 
 	//============Iterative exec and reading=============//
-	public static void Iterative()
+	public static void interactive()
 	{
 		int			type;
 		int			ownValues;
@@ -539,7 +538,7 @@ public class Main{
 
 	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, double[][] matrix)
 	{
-		System.out.printf("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length);
+		outputFunction("//Foram calculados " + ownVs[1].length + " valores e vetores próprios//\n");
 
 		outputFunction("\nMatriz de vetores próprios::\n");
 		printMatrix(ownVs[0]);
@@ -547,7 +546,7 @@ public class Main{
 		outputFunction("Matriz de valores próprios::\n");
 		printMatrix(ownVs[1]);
 
-		System.out.print("Matriz resultante da multiplicação das matrizes decompostas::\n");
+		outputFunction("Matriz resultante da multiplicação das matrizes decompostas::\n");
 
 		for (int i = 0; i < decompressedMatrix.length; i++)
 			for (int j = 0; j < decompressedMatrix[0].length; j++)
@@ -648,11 +647,6 @@ public class Main{
 			for (int j = 0; j < manyVectors; j++)
 				mediumVector[i] += allImgsInVector[j][i];
 		mediumVector = vectorDivConst(mediumVector, manyVectors);
-		/*System.out.println();
-		for (int i = 0; i < vectorItens; i++)
-			System.out.printf("%.1f ",mediumVector[i]);
-		System.out.println();
-		System.out.println();*/
 		return (mediumVector);
 	}
 
@@ -742,28 +736,19 @@ public class Main{
 		allWeights = calculateAllWeights(allPhis, eigenVectors, allImagesInVector);
 
 
-
-
 		eigenVectorLength = eigenVectors.length;
-//		System.out.println("EIGEN VECTORS");
-//		printMatrix(eigenVectors);
-//		System.out.println(eigenVectorLength);
 
 		if(precisionValues < eigenVectorLength && precisionValues != -1){
 			eigenVectorLength = precisionValues;
 		}
 
 
-
         for (int i = 0; i < allImagesInVector.length; i++) {
 			for (int j = 0; j < eigenVectorLength; j++) {
-				System.out.println(eigenVectors[j][i]);
-				System.out.println(allWeights[i][j]);
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
 			reconstructionMatrix[i] = vectorAdd(reconstructionMatrix[i], averageVector);
 		}
-
 
 
 		return reconstructionMatrix;
@@ -800,6 +785,7 @@ public class Main{
         double[][] 		imageMatrix;
         double[] 		newPhi;
         double[] 		imageVector;
+		double[]		adjustedMediumVector;
 
         imageMatrix = CSVtoMatrix(csvPath);
 		if(imageMatrix == null)
@@ -807,12 +793,9 @@ public class Main{
 
         imageVector = MatrixToVerticalVector(imageMatrix);
 
-        //multiplying by -1 so that the addition is a subtraction
-        mediumVector = vectorMultConst(mediumVector, -1);
+		adjustedMediumVector = vectorMultConst(mediumVector, -1);
 
-        newPhi = vectorAdd(imageVector, mediumVector); //subtraction
-
-		mediumVector = vectorMultConst(mediumVector, -1);
+        newPhi = vectorAdd(imageVector, adjustedMediumVector); //subtraction
 
         return newPhi;
     }
@@ -846,7 +829,7 @@ public class Main{
 		return index;
 	}
 
-	public static void outputsThirdFuncionality(String csvPath, String[] files, int own_values, double[] allEuclideanDistances, int indexOfMinEuclideanDistance, double[] newWeights, double[][] allWeights)
+	public static void outputsThirdFunctionality(String csvPath, String[] files, int own_values, double[] allEuclideanDistances, int indexOfMinEuclideanDistance, double[] newWeights, double[][] allWeights)
 	{
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|             Output from functionality 3:             |");
@@ -871,7 +854,6 @@ public class Main{
 			matrixToJPG(ReadingCsv(files[indexOfMinEuclideanDistance]), PATH_WRITE_JPG + "outpuImgFromExec.jpg");
 		} catch (IOException e) {
 		}
-		outputFunction(indexOfMinEuclideanDistance+"\n\n");
 	}
 
 	public static void SearchClosest(int own_values, String csvPath, String dirPath)
@@ -924,7 +906,7 @@ public class Main{
 		}
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
-		outputsThirdFuncionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights, allWeights);
+		outputsThirdFunctionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights, allWeights);
 	}
 
 	public static double[][] vectorToMatrix(double[] vector){
@@ -1066,8 +1048,7 @@ public class Main{
 		addedVector = new double[vectorLen];
 
 		if(vector1.length != vector2.length){
-			System.out.println("NAO PODE");
-			System.exit(0);
+			return null;
 		}
 
 		for (int i = 0; i < vectorLen; i++)
