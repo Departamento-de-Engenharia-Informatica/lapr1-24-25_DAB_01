@@ -19,8 +19,8 @@ public class Main{
 	public static final int MAX_VALUE_IN_CSV = 255;
 	public static final int MIN_VALUE_IN_CSV = 0;
 	public static final String PATH_WRITE_JPG = "Identificacao/";
-	public static final String PATH_WRITE_CSV = "Outputs/";
-	public static final String PATH_RECONSTRUTION = "ImagensReconstruidas/";
+	public static final String PATH_WRITE_CSV = "Output/";
+	public static final String PATH_RECONSTRUCTION = "ImagensReconstruidas/";
 	public static final String PATH_EIGENFACES = "Eigenfaces/";
 
 	public static final int MIN_OWN_VALUE = -1;
@@ -64,6 +64,10 @@ public class Main{
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
+					return;
+				}
 				path = arguments[5];
 				pathWrite = arguments[6];
 				try{
@@ -82,6 +86,10 @@ public class Main{
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
+					return;
+				}
 				dirPath = arguments[5];
 				pathWrite = arguments[6];
 				try{
@@ -101,6 +109,10 @@ public class Main{
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
+					return;
+				}
 				path = arguments[5];
 				dirPath = arguments[7];
 				pathWrite = arguments[8];
@@ -306,6 +318,7 @@ public class Main{
 			for (int i = 0; i < Csv.length; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 		}
+
 		return (toReturn);
 	}
 
@@ -406,11 +419,11 @@ public class Main{
 
 		arrayOfCoordinates = new int[numberOfValues];
 		for (int i = 0; i < numberOfValues; i++) {
-			minValue = Math.abs(matrix[0][0]);
+			minValue = matrix[0][0];
 			coordinates = 0;
 			for (int j = 0; j < matrix[0].length; j++) {
 				if (Math.abs(matrix[j][j]) < minValue && !isValueInArray(j, arrayOfCoordinates)) {
-					minValue = Math.abs(matrix[j][j]);
+					minValue = matrix[j][j];
 					coordinates = j;
 				}
 			}
@@ -557,7 +570,7 @@ public class Main{
 		if (ownVs[0][0].length == decompressedMatrix.length || ownValues == -1) {
 			outputFunction("O Erro Absoluto Médio é :: 0\n");
 		} else {
-			outputFunction("O Erro Absoluto Médio é :: " + avgAbsolutError(matrix, decompressedMatrix) + "\n");
+			outputFunction("O Erro Absoluto Médio é :: " + String.format("%.2f",avgAbsolutError(matrix, decompressedMatrix)) + "\n");
 		}
 	}
 
@@ -565,6 +578,11 @@ public class Main{
 	{
 		double[][] 		decompressedMatrix;
 		double[][][] 	ownVs;
+
+		if (matrix == null){
+			System.out.println("Input file does not exist");
+			return ;
+		}
 
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|             Output from functionality 1:             |");
@@ -608,6 +626,10 @@ public class Main{
 			outputFunction("Invalid number of eigenfaces\n");
 		}
 
+		if (precisionValues > eigenVectors.length){
+			precisionValues = eigenVectors.length;
+		}
+
 		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
 
 		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors, precisionValues);
@@ -633,17 +655,12 @@ public class Main{
 
 		matrixToCSV(eigenVectors, "Eigenfaces/eigenfaces.csv");
 
-		try{
-			matrixToJPG(eigenVectors, PATH_EIGENFACES+"eigenfaces.jpg");
-		}catch (IOException e){
-
-		}
 
 		for(int i = 0; i < reconstructionMatrix.length; i++){
 			try{
-				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUTION+"img%d.csv", i));
-				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUTION+"img%d.jpg", i));
-			}catch (IOException e){
+				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.csv", i));
+				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.jpg", i));
+			}catch (IOException _){
 
 			}
 		}
@@ -872,8 +889,8 @@ public class Main{
 			outputFunction(files[i] + "\tand\t" + csvPath + " = " + allEuclideanDistances[i] + "\n");
 
 		try {
-			matrixToJPG(ReadingCsv(files[indexOfMinEuclideanDistance]), PATH_WRITE_JPG + "outpuImgFromExec.jpg");
-		} catch (IOException e) {
+			matrixToJPG(ReadingCsv(files[indexOfMinEuclideanDistance]), PATH_WRITE_JPG + "outputImgFromExec.jpg");
+		} catch (IOException _) {
 		}
 	}
 
@@ -1152,7 +1169,7 @@ public class Main{
 				for(int j = 0; j < width; j++){
 					line += (int) matrix[i][j];
 
-					if(j != width-1){
+					if(j != width - 1){
 						line += ",";
 					}
 				}
@@ -1186,7 +1203,6 @@ public class Main{
 				int intensity = (int) Math.round(matrix[y][x]);
 				if (intensity < MIN_VALUE_IN_CSV ) {
 					intensity = 0;
-					//throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
 				}else if (intensity > MAX_VALUE_IN_CSV){
 					intensity = 255;
 				}
@@ -1201,7 +1217,7 @@ public class Main{
 	}
 
 	//===================Status Verifier===================//
-	public static boolean isSimetric(double[][] matrix){
+	public static boolean isSimetric(double[][] matrix) {
 		if (matrixEquals(matrix, matrixTranspose(matrix))) {
 			return true;
 		}
@@ -1244,5 +1260,12 @@ public class Main{
 				return (false);
 		}
 		return (true);
+	}
+
+	public static boolean isOwnValueValid(int ownValue){
+
+		if (ownValue == MIN_OWN_VALUE){
+			return true;
+		} else return ownValue > 0;
 	}
 }
