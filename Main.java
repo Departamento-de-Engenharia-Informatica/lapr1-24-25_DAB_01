@@ -306,16 +306,6 @@ public class Main{
 			for (int i = 0; i < Csv.length; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
 		}
-
-
-		for (int i = 0; i < toReturn.length; i++)
-		{
-			for (int k = 0; k < toReturn[0].length; k++)
-			{
-				System.out.printf("%.2f ", toReturn[i][k]);
-			}
-			System.out.println();
-		}
 		return (toReturn);
 	}
 
