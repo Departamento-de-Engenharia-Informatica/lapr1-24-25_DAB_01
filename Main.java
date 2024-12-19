@@ -20,7 +20,8 @@ public class Main{
 	public static final int MIN_VALUE_IN_CSV = 0;
 	public static final String PATH_WRITE_JPG = "Identificacao/";
 	public static final String PATH_WRITE_CSV = "Outputs/";
-
+	public static final String PATH_RECONSTRUTION = "ImagensReconstruidas/";
+	public static final String PATH_EIGENFACES = "Eigenfaces/";
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -58,7 +59,7 @@ public class Main{
 			case 1:
 				if (!CheckingArgs(arguments, 1))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 
@@ -70,13 +71,13 @@ public class Main{
 					doingFunctionOne(ownValues, CSVtoMatrix(path));
 					outputFile.close();
 				}catch (IOException e) {
-					System.out.println("Not possible to write, closing program!");
+					outputFunction("Not possible to write, closing program!");
 				}
 				break ;
 			case 2:
 				if (!CheckingArgs(arguments, 2))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 
@@ -85,17 +86,17 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
-					Recomposition(ownValues, dirPath);
+					doingFunctionTwo(ownValues, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					System.out.println("Not possible to write, closing program!");
+					outputFunction("Not possible to write, closing program!");
 				}
 
 				break ;
 			case 3:
 				if (!CheckingArgs(arguments, 3))
 				{
-					System.out.println("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
 				}
 
@@ -108,7 +109,7 @@ public class Main{
 					SearchClosest(ownValues, path, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					System.out.println("Not possible to write, closing program!");
+					outputFunction("Not possible to write, closing program!");
 				}
 
 				break ;
@@ -184,7 +185,7 @@ public class Main{
 					break;
 				case 2:
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
-					Recomposition(ownValues, dirPath);
+					doingFunctionTwo(ownValues, dirPath);
 					break;
 				case 3:
 					path = GetPath("|Enter the file PATH of execution:|\n");
@@ -204,7 +205,7 @@ public class Main{
 		outputFunction("----------------------------------\n");
 		outputFunction("|        Menu of execution      |\n");
 		outputFunction("----------------------------------\n");
-		System.out.print("|Enter the type of execution:   |\n");
+		outputFunction("|Enter the type of execution:   |\n");
 		outputFunction("|(0) Exit Program               |\n");
 		outputFunction("|(1) Decomposition of images    |\n");
 		outputFunction("|(2) Rebuild images             |\n");
@@ -243,7 +244,7 @@ public class Main{
 		String	path;
 
 		outputFunction("-----------------------------------\n");
-		System.out.printf("%s", searching);
+		outputFunction(String.format("%s", searching));
 		outputFunction("-----------------------------------\n");
 		path = input.nextLine();
 		return (path);
@@ -253,13 +254,12 @@ public class Main{
 	public static void outputFunction(String toPrint)
 	{
 		if (outputFile == null)
-			System.out.printf("%s", toPrint);
-		else
-		{
+			System.out.printf(toPrint);
+		else {
 			try {
 				outputFile.write(toPrint);
 			} catch (IOException e) {
-				outputFunction("Not possible to create the file!\n");
+				
 			}
 		}
 	}
@@ -538,7 +538,7 @@ public class Main{
 
 	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, double[][] matrix)
 	{
-		outputFunction("//Foram calculados " + ownVs[1].length + " valores e vetores próprios//\n");
+		outputFunction(String.format("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length));
 
 		outputFunction("\nMatriz de vetores próprios::\n");
 		printMatrix(ownVs[0]);
@@ -578,14 +578,15 @@ public class Main{
 	}
 
 	//=========2=========//
-	public static void Recomposition(int precisionValues, String dirPath)
+	public static void doingFunctionTwo(int precisionValues, String dirPath)
 	{
 		double[][]			reconstructionMatrix;
 
 
 		double				averageAbsoluteError;
 		double[]			averageVector;
-		double[]			phi;
+		double[][]			allPhis;
+		double[][]			allWeights;
 		double[][]			matrixInVector;
 		double[][]			reverseCovarianceMatrix;
 		double[][]			eigenVectors;
@@ -598,28 +599,56 @@ public class Main{
 		averageVector = CalculateMediumVector(matrixInVector);
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(matrixInVector, averageVector);
 		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, matrixInVector, averageVector, precisionValues);
-		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
+		allPhis = calculateAllPhis(matrixInVector, averageVector);
+		allWeights = calculateAllWeights(allPhis, eigenVectors, eigenVectors);
 
-	for(int i = 0; i < reconstructionMatrix.length; i++){
+		if(precisionValues == -1){
+			precisionValues = eigenVectors.length;
+		}else if(precisionValues <= 0){
+			outputFunction("Invalid number of eigenfaces\n");
+		}
+
+		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
+		
+		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors, precisionValues);
+
+	}
+
+	public static void outputFunctionTwo(double[] avgVector, double[][] covMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors ,int precisionValues){
+
+		outputFunction("\n|======================================================|");
+		outputFunction("\n|             Output from functionality 2:             |");
+		outputFunction("\n|======================================================|\n");
+
+		outputFunction(String.format("Number of eigenfaces used: %d", precisionValues));
+
+		outputFunction("\nAverage Vector:\n");
+		printVector(avgVector);
+
+		outputFunction("\nCovariance Matrix\n");
+		printMatrix(covMatrix);
+
+		outputFunction("Weights used: \n");
+		printMatrix(allWeights);
+
+		matrixToCSV(eigenVectors, "Eigenfaces/eigenfaces.csv");
+
 		try{
-			matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format("Output/img%d.jpg", i));
+			matrixToJPG(eigenVectors, PATH_EIGENFACES+"eigenfaces.jpg");
 		}catch (IOException e){
 
 		}
-	}
-		printMatrix(reconstructionMatrix);
 
+		for(int i = 0; i < reconstructionMatrix.length; i++){
+			try{
+				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUTION+"img%d.csv", i));
+				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUTION+"img%d.jpg", i));
+			}catch (IOException e){
+
+			}
+		}
 	}
 
-	public static void VerticalVectorMatrix(int OwnValues, String dirPath)
-	{
-		String[] 		dirCsvFiles;
-		double[][] 		verticalVectorMatrix;
-
-		dirCsvFiles = ReadingDir(dirPath);
-		verticalVectorMatrix = AllImgsInVector(dirCsvFiles);
-		//printMatrix(verticalVectorMatrix);
-	}
 
 	public static double[][] AllImgsInVector(String[] files)
 	{
@@ -647,6 +676,7 @@ public class Main{
 			for (int j = 0; j < manyVectors; j++)
 				mediumVector[i] += allImgsInVector[j][i];
 		mediumVector = vectorDivConst(mediumVector, manyVectors);
+
 		return (mediumVector);
 	}
 
@@ -722,25 +752,17 @@ public class Main{
 		return Math.sqrt(sum);
 	}
 
-	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int precisionValues, double[] averageVector, double[][] allImagesInVector)
+	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[] averageVector, double[][] allImagesInVector)
 	{
 		double[][] 		reconstructionMatrix;
 		double[][] 		allWeights;
 		double[][]		allPhis;
 
-		int 			eigenVectorLength;
 
 		reconstructionMatrix = new double[allImagesInVector.length][allImagesInVector[0].length];
 
 		allPhis = calculateAllPhis(allImagesInVector, averageVector);
 		allWeights = calculateAllWeights(allPhis, eigenVectors, allImagesInVector);
-
-
-		eigenVectorLength = eigenVectors.length;
-
-		if(precisionValues < eigenVectorLength && precisionValues != -1){
-			eigenVectorLength = precisionValues;
-		}
 
 
         for (int i = 0; i < allImagesInVector.length; i++) {
@@ -749,7 +771,6 @@ public class Main{
 			}
 			reconstructionMatrix[i] = vectorAdd(reconstructionMatrix[i], averageVector);
 		}
-
 
 		return reconstructionMatrix;
 	}
@@ -1096,14 +1117,10 @@ public class Main{
 		for (int rows = 0; rows < matrix.length; rows++) {
 			for (int columns = 0; columns < matrix[0].length; columns++)
 			{
-				outputFunction(String.format("%.2f ", matrix[rows][columns]));
+				outputFunction(String.format("%.0f ", matrix[rows][columns]));
             }
 			outputFunction("\n");
-//			try{
-//				Thread.sleep(10000);
-//			} catch (InterruptedException e) {
-//				throw new RuntimeException(e);
-//			}
+
 		}
 		outputFunction("\n");
 	}
@@ -1111,7 +1128,7 @@ public class Main{
 	public static void printVector(double[] vector)
 	{
 		for (int i = 0; i < vector.length; i++) {
-			outputFunction(String.format("%.2f ", vector[i]));
+			outputFunction(String.format("%.0f ", vector[i]));
 		}
 		outputFunction("\n");
 	}
