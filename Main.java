@@ -68,11 +68,10 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
-					System.out.printf("arguments received:\nownValue= %d\npath = %s\npathWrite = %s\n", ownValues, path, pathWrite);
-					//function
+					Decomposition(ownValues, CSVtoMatrix(path));
 					outputFile.close();
 				}catch (IOException e) {
-					System.out.println("Not possible to write");
+					System.out.println("Not possible to write, closing program!");
 				}
 				break ;
 			case 2:
@@ -87,11 +86,10 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
-					// function
-					System.out.printf("arguments received:\nownValue= %d\ndirPath = %s\npathWrite = %s\n", ownValues, dirPath, pathWrite);
+					Recomposition(ownValues, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					System.out.println("Not possible to write");
+					System.out.println("Not possible to write, closing program!");
 				}
 
 				break ;
@@ -108,11 +106,10 @@ public class Main{
 				pathWrite = arguments[8];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
-					// function
-					System.out.printf("arguments received:\nownValue= %d\npath = %s\ndirPath = %s\npathWrite = %s\n", ownValues, path, dirPath, pathWrite);
+					SearchClosest(ownValues, path, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					System.out.println("Not possible to write");
+					System.out.println("Not possible to write, closing program!");
 				}
 
 				break ;
@@ -138,7 +135,7 @@ public class Main{
 		{
 			if(!(arguments[2].equals("-k")))
 				return (false);
-			if(!(arguments[4].equals("-i")))
+			if(!(arguments[4].equals("-d")))
 				return (false);
 			if (arguments.length != 7)
 				return (false);
@@ -557,7 +554,7 @@ public class Main{
 				decompressedMatrix[i][j] = Math.round(decompressedMatrix[i][j]);
 
 		printMatrix(decompressedMatrix);
-		
+
 		if (ownVs[0][0].length == decompressedMatrix.length || ownValues == -1) {
 			outputFunction("O Erro Absoluto Médio é :: 0\n");
 		} else {
