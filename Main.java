@@ -259,7 +259,7 @@ public class Main{
 			try {
 				outputFile.write(toPrint);
 			} catch (IOException e) {
-				
+
 			}
 		}
 	}
@@ -282,51 +282,61 @@ public class Main{
 	public static double[][] ReadingCsv(String filename)
 	{
 		File		file = new File(filename);
-		Scanner		ReadFile;
-		String		regex = "[,]";
-		String[]	Csv;
 		double[][]	toReturn = null;
-		int			noOfColumns = 0;
+		Scanner		ReadFile;
 		int			noOfLines;
-		int			j;
+		String[]	Csv;
 
-		j = 0;
+
+		noOfLines = GetNumLinesNonEmpty(file);
+		if (noOfLines <= 0)
+			return null;
+
 		try {
 			ReadFile = new Scanner(file);
 		} catch (FileNotFoundException e) {
 			return null;
 		}
 
-		noOfLines = GetNumLines(file);
-		if (noOfLines == -1)
-			return (null);
-		while (ReadFile.hasNextLine())
+		for (int j = 0; j < noOfLines; j++)
 		{
-			Csv = ReadFile.nextLine().split(regex);
+			Csv = ReadFile.nextLine().split("[,]");
 			if (j == 0)
-			{
-				noOfColumns = Csv.length;
-				toReturn = new double[noOfLines][noOfColumns];
-			}
-			for (int i = 0; i < noOfColumns; i++)
+				toReturn = new double[noOfLines][Csv.length];
+			for (int i = 0; i < Csv.length; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
-			j++;
 		}
 
+
+		for (int i = 0; i < toReturn.length; i++)
+		{
+			for (int k = 0; k < toReturn[0].length; k++)
+			{
+				System.out.printf("%.2f ", toReturn[i][k]);
+			}
+			System.out.println();
+		}
 		return (toReturn);
 	}
 
-	public static int GetNumLines(File file)
+	public static int GetNumLinesNonEmpty(File file)
 	{
-		int	noOfLines;
+		String	read;
+		int		noOfLines;
+		Scanner		ReadFile;
 
-		noOfLines = -1;
-		try (LineNumberReader	lnr = new LineNumberReader(new FileReader(file))){
-			lnr.skip(Long.MAX_VALUE);
-			noOfLines = lnr.getLineNumber();
-		} catch (IOException e) {
-			System.err.println("An I/O error occurred");
-			return (noOfLines);
+		noOfLines = 0;
+		try {
+			ReadFile = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			return -1;
+		}
+		while (ReadFile.hasNextLine())
+		{
+			read = ReadFile.nextLine();
+			if (read.isEmpty())
+				break ;
+			noOfLines++;
 		}
 		return (noOfLines);
 	}
@@ -609,7 +619,7 @@ public class Main{
 		}
 
 		reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
-		
+
 		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors, precisionValues);
 
 	}
