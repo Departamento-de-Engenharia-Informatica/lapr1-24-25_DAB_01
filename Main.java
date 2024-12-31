@@ -5,7 +5,6 @@ import java.io.*;
 import org.apache.commons.math3.linear.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import javax.sound.sampled.SourceDataLine;
 
 public class Main{
 	public static boolean			hasOutputInFile = false;
@@ -58,7 +57,7 @@ public class Main{
 		type = Integer.parseInt(arguments[1]);
 		switch (type) {
 			case 1:
-				if (!CheckingArgs(arguments, 1))
+				if (!CheckingArgs(arguments, FUNC_1))
 				{
 					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
@@ -80,7 +79,7 @@ public class Main{
 				}
 				break ;
 			case 2:
-				if (!CheckingArgs(arguments, 2))
+				if (!CheckingArgs(arguments, FUNC_2))
 				{
 					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
@@ -103,7 +102,7 @@ public class Main{
 
 				break ;
 			case 3:
-				if (!CheckingArgs(arguments, 3))
+				if (!CheckingArgs(arguments, FUNC_3))
 				{
 					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
 					return ;
@@ -128,14 +127,12 @@ public class Main{
 				break ;
 			default:
 				outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
-				return ;
-			}
-		return ;
-	}
+        }
+    }
 
 	public static boolean CheckingArgs(String[] arguments, int whichExec)
 	{
-		if (whichExec == 1)
+		if (whichExec == FUNC_1)
 		{
 			if(!(arguments[2].equals("-k")))
 				return (false);
@@ -144,7 +141,7 @@ public class Main{
 			if (arguments.length != 7)
 				return (false);
 		}
-		else if (whichExec == 2)
+		else if (whichExec == FUNC_2)
 		{
 			if(!(arguments[2].equals("-k")))
 				return (false);
@@ -153,7 +150,7 @@ public class Main{
 			if (arguments.length != 7)
 				return (false);
 		}
-		else if (whichExec == 3)
+		else if (whichExec == FUNC_3)
 		{
 			if(!(arguments[2].equals("-k")))
 				return (false);
@@ -184,7 +181,7 @@ public class Main{
 				break ;
 			ownValues = OwnValues();
 			switch (type) {
-				case 1:
+				case FUNC_1:
 					double[][] matrix;
 
 					path = GetPath("|Enter the file PATH of execution:|\n");
@@ -196,11 +193,11 @@ public class Main{
 					}
 					doingFunctionOne(ownValues, matrix);
 					break;
-				case 2:
+				case FUNC_2:
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
 					doingFunctionTwo(ownValues, dirPath);
 					break;
-				case 3:
+				case FUNC_3:
 					path = GetPath("|Enter the file PATH of execution:|\n");
 					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
 					SearchClosest(ownValues, path, dirPath);
@@ -228,7 +225,7 @@ public class Main{
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 		{
 			read = input.nextInt();
-			if (!(read <= 3 && read >= 0))
+			if (!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 				outputFunction("You've entered a wrong value. Try it again: \n");
 		}
 		return (read);
@@ -486,41 +483,38 @@ public class Main{
 		double[][] 		eiganVectors;
 		double[][] 		eiganValues;
 
-		double[][] 		eiganVectorsSubMatrix;
-		double[][] 		eiganValuesSubMatrix;
+		double[][] 		eigenVectorsSubMatrix;
+		double[][] 		eigenValuesSubMatrix;
 
 		int[] 			arrayOfCoordinatesOfMinOwnValues;
 		int 			numberValuesToRemove;
-
 		int 			totalNumberOfOwnValues;
 
-		EigenDecomposition eiganDecompositor;
 
-		RealMatrix 		eiganVectorsApache;
-		RealMatrix 		eiganValuesApache;
+		EigenDecomposition eigenDecompositor;
+		RealMatrix 		eigenVectorsApache;
+		RealMatrix 		eigenValuesApache;
 
-		eiganDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
+		eigenDecompositor = new EigenDecomposition(transformDoubleMatrixToRealMatrix(covarianceMatrix));
 
-		eiganVectorsApache = eiganDecompositor.getV();
-		eiganValuesApache = eiganDecompositor.getD();
+		eigenVectorsApache = eigenDecompositor.getV();
+		eigenValuesApache = eigenDecompositor.getD();
 
-		eiganVectors = eiganVectorsApache.getData();
-		eiganValues = eiganValuesApache.getData();
+
+		eiganVectors = eigenVectorsApache.getData();
+		eiganValues = eigenValuesApache.getData();
 
 		totalNumberOfOwnValues = eiganValues.length;
-
-		eiganVectorsSubMatrix = new double[totalNumberOfOwnValues][totalNumberOfOwnValues];
-		eiganValuesSubMatrix = new double[eiganVectors.length][totalNumberOfOwnValues];
 
 
 		if (own_values < totalNumberOfOwnValues && own_values != -1) {
 			numberValuesToRemove = totalNumberOfOwnValues - own_values;
 			arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
 
-			eiganVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
-			eiganValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
+			eigenVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
+			eigenValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
 
-			resultMatrix = new double[][][]{eiganVectorsSubMatrix, eiganValuesSubMatrix};
+			resultMatrix = new double[][][]{eigenVectorsSubMatrix, eigenValuesSubMatrix};
 		} else {
 			resultMatrix = new double[][][]{eiganVectors, eiganValues};
 		}
@@ -629,19 +623,22 @@ public class Main{
         }
 
         matrixInVector = AllImgsInVector(csvFilesInFolder);
+
         averageVector = CalculateMediumVector(matrixInVector);
 		allPhis = calculateAllPhis(matrixInVector, averageVector);
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
+
 		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, precisionValues);
-		allWeights = calculateAllWeights(allPhis, eigenVectors, eigenVectors);
+		allWeights = calculateAllWeights(allPhis, eigenVectors, matrixInVector);
+
 		
         reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectors.length);
 
 		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors);
 	}
 
-	public static void outputFunctionTwo(double[] avgVector, double[][] covMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors){
+	public static void outputFunctionTwo(double[] avgVector, double[][] reverseCovMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors){
 
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|             Output from functionality 2:             |");
@@ -653,7 +650,7 @@ public class Main{
 		printVector(avgVector);
 
 		outputFunction("\nCovariance Matrix\n");
-		printMatrix(covMatrix);
+		printMatrix(reverseCovMatrix);
 
 		outputFunction("Weights used: \n");
 		printMatrix(allWeights);
@@ -665,7 +662,7 @@ public class Main{
 			try{
 				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.csv", i));
 				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.jpg", i));
-			}catch (IOException e){
+			}catch (IOException _){
 
 			}
 		}
@@ -709,7 +706,8 @@ public class Main{
 		for (int i = 0; i < vectorItens; i++)
 			for (int j = 0; j < manyVectors; j++)
 				mediumVector[i] += allImgsInVector[j][i];
-		mediumVector = vectorDivConst(mediumVector, manyVectors);
+
+		vectorDivConst(mediumVector, manyVectors);
 
 		return (mediumVector);
 	}
@@ -823,18 +821,9 @@ public class Main{
 		return weights;
 	}
 
-    // change the function to receive the [][]matrix and no the path, so we can verify that earlier, before creating the allImgVectors
-	public static double[] calculateNewPhi(String csvPath, double[] mediumVector){
-        double[][]         imageMatrix;
+	public static double[] calculateNewPhi(double[] imageVector, double[] mediumVector){
         double[]         newPhi;
-        double[]         imageVector;
         double[]        adjustedMediumVector;
-
-        imageMatrix = CSVtoMatrix(csvPath);
-        if (!validMatrix(imageMatrix))
-            return (null);
-
-        imageVector = MatrixToVerticalVector(imageMatrix);
 
         adjustedMediumVector = vectorMultConst(mediumVector, -1);
 
@@ -907,8 +896,10 @@ public class Main{
 		double[] 		mediumVector;
 
 		double[] 		newPhi;
+		double[][]		imageMatrix;
+		double[]		imageVector;
 
-        double[][] 		covarianceMatrix;
+        double[][] 		reverseCovarianceMatrix;
         double[][]		eiganVectors;
 
 		double[] 		newWeights;
@@ -920,12 +911,19 @@ public class Main{
 		int 			indexOfMinEuclideanDistance;
 
 		files = ReadingDir(dirPath);
-		allImagesVector = AllImgsInVector(files);	
+		allImagesVector = AllImgsInVector(files);
 		if(allImagesVector == null){
 			return ;
 		}
 		mediumVector = CalculateMediumVector(allImagesVector);
-		newPhi = calculateNewPhi(csvPath, mediumVector);
+
+		imageMatrix = CSVtoMatrix(csvPath);
+		if (!validMatrix(imageMatrix))
+			return ;
+
+		imageVector = MatrixToVerticalVector(imageMatrix);
+
+		newPhi = calculateNewPhi(imageVector, mediumVector);
 		if(newPhi == null)
 		{	
 			return ;
@@ -933,9 +931,9 @@ public class Main{
 
 		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
-		covarianceMatrix = buildReverseCovarianceMatrix(allPhis);
+		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
 
-		eiganVectors = getEigenVectorsOfCovarianceMatrix(covarianceMatrix, allPhis, own_values);
+		eiganVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, own_values);
 
 		newWeights = calculateWeights(eiganVectors, newPhi);
 
