@@ -612,46 +612,42 @@ public class Main{
 	//=========2=========//
 	public static void doingFunctionTwo(int precisionValues, String dirPath)
 	{
-		double[][]            reconstructionMatrix;
+		double[][]		reconstructionMatrix;
 
-
-        double                averageAbsoluteError;
-        double[]            averageVector;
-        double[]            phi;
-        double[][]            matrixInVector;
-        double[][]            reverseCovarianceMatrix;
-        double[][]            eigenVectors;
-        String[]            PathToCompare;
-        String[]            csvFilesInFolder;
+        double[]		averageVector;
+        double[][]		matrixInVector;
+		double[][]		allPhis;
+		double[][]		allWeights;
+        double[][]      reverseCovarianceMatrix;
+        double[][]      eigenVectors;
+        String[]        csvFilesInFolder;
 
 
         csvFilesInFolder = ReadingDir(dirPath);
         if(AllImgsInVector(csvFilesInFolder) == null){
             return ; 
         }
+
         matrixInVector = AllImgsInVector(csvFilesInFolder);
         averageVector = CalculateMediumVector(matrixInVector);
-        reverseCovarianceMatrix = buildReverseCovarianceMatrix(matrixInVector, averageVector);
-        eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, matrixInVector, averageVector, precisionValues);
-        reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, precisionValues, averageVector, matrixInVector);
+		allPhis = calculateAllPhis(matrixInVector, averageVector);
 
-    for(int i = 0; i < reconstructionMatrix.length; i++){
-        try{
-            matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format("Output/img%d.jpg", i));
-        }catch (IOException e){
+		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
+		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, precisionValues);
+		allWeights = calculateAllWeights(allPhis, eigenVectors, eigenVectors);
+		
+        reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectors.length);
 
-        }
-    }
-        printMatrix(reconstructionMatrix);
+		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors);
 	}
 
-	public static void outputFunctionTwo(double[] avgVector, double[][] covMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors ,int precisionValues){
+	public static void outputFunctionTwo(double[] avgVector, double[][] covMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors){
 
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|             Output from functionality 2:             |");
 		outputFunction("\n|======================================================|\n");
 
-		outputFunction(String.format("Number of eigenfaces used: %d", precisionValues));
+		outputFunction(String.format("Number of eigenfaces used: %d", eigenVectors.length));
 
 		outputFunction("\nAverage Vector:\n");
 		printVector(avgVector);
@@ -735,29 +731,23 @@ public class Main{
         return matrix;
 	}
 
-	public static double[][] buildReverseCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
+	public static double[][] buildReverseCovarianceMatrix(double[][] allPhis)
 	{
 		double[][] 		matrix;
-		double[][] 		reverseCovarianceMatrix;
 
-		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
+		matrix = matrixMulti(allPhis, matrixTranspose(allPhis));
 
-		reverseCovarianceMatrix = matrixMulti(matrix, matrixTranspose(matrix));
-
-		return reverseCovarianceMatrix;
+		return matrix;
 	}
 
-	public static double[][] getEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allImagesMatrix, double[] mediumVector,int ownValues){
+	public static double[][] getEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix, double[][] allPhis, int precisionValues){
 
 		double[][][]		decomposedReverseCovarianceMatrix;
 		double[][]			eigenVectorsOfReverseCovarianceMatrix;
 		double[][]			eigenVectorsOfCovarianceMatrix;
-		double[][]			allPhis;
 
-		decomposedReverseCovarianceMatrix = Decomposition(ownValues, reverseCovarianceMatrix);
+		decomposedReverseCovarianceMatrix = Decomposition(precisionValues, reverseCovarianceMatrix);
 		eigenVectorsOfReverseCovarianceMatrix = decomposedReverseCovarianceMatrix[0];
-
-		allPhis = calculateAllPhis(allImagesMatrix, mediumVector);
 
 		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
 
@@ -790,20 +780,13 @@ public class Main{
 		return Math.sqrt(sum);
 	}
 
-	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[] averageVector, double[][] allImagesInVector)
+	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, double[][] allPhis, double[][] allWeights, double[] averageVector, int eigenVectorLength)
 	{
 		double[][] 		reconstructionMatrix;
-		double[][] 		allWeights;
-		double[][]		allPhis;
 
+		reconstructionMatrix = new double[allPhis.length][allPhis[0].length];
 
-		reconstructionMatrix = new double[allImagesInVector.length][allImagesInVector[0].length];
-
-		allPhis = calculateAllPhis(allImagesInVector, averageVector);
-		allWeights = calculateAllWeights(allPhis, eigenVectors, allImagesInVector);
-
-
-        for (int i = 0; i < allImagesInVector.length; i++) {
+        for (int i = 0; i < allPhis.length; i++) {
 			for (int j = 0; j < eigenVectorLength; j++) {
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
@@ -948,13 +931,14 @@ public class Main{
 			return ;
 		}
 
-		covarianceMatrix = buildReverseCovarianceMatrix(allImagesVector, mediumVector);
+		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
-		eiganVectors = getEigenVectorsOfCovarianceMatrix(covarianceMatrix, allImagesVector, mediumVector, own_values);
+		covarianceMatrix = buildReverseCovarianceMatrix(allPhis);
+
+		eiganVectors = getEigenVectorsOfCovarianceMatrix(covarianceMatrix, allPhis, own_values);
 
 		newWeights = calculateWeights(eiganVectors, newPhi);
 
-		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
 		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
 
