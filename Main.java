@@ -60,7 +60,7 @@ public class Main{
 				if (!CheckingArgs(arguments, FUNC_1))
 				{
 					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
-					return ;
+					return;
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
@@ -88,7 +88,7 @@ public class Main{
 				ownValues = Integer.parseInt(arguments[3]);
 				if (!isOwnValueValid(ownValues)){
 					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
-					return;
+					return ;
 				}
 				dirPath = arguments[5];
 				pathWrite = arguments[6];
@@ -239,7 +239,7 @@ public class Main{
 		outputFunction("---------------------------------------------------------------\n");
 		System.out.print("|Enter the number of own values that you want to use(columns):|\n");
 		outputFunction("---------------------------------------------------------------\n");
-		while (read < MIN_OWN_VALUE)
+		while (read == 0 || read < MIN_OWN_VALUE)
 		{
 			read = input.nextInt();
 			input.nextLine();
@@ -268,7 +268,7 @@ public class Main{
 		else {
 			try {
 				outputFile.write(toPrint);
-			} catch (IOException e) {
+			} catch (IOException _) {
 
 			}
 		}
@@ -549,7 +549,7 @@ public class Main{
 
 	public static double[][] calculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues)
 	{
-		double[][] 		intermediaryMatrix;;
+		double[][] 		intermediaryMatrix;
 
 		intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
 
@@ -885,7 +885,7 @@ public class Main{
 
 		try {
 			matrixToJPG(ReadingCsv(files[indexOfMinEuclideanDistance]), PATH_WRITE_JPG + "outputImgFromExec.jpg");
-		} catch (IOException e) {
+		} catch (IOException _) {
 		}
 	}
 
@@ -900,7 +900,7 @@ public class Main{
 		double[]		imageVector;
 
         double[][] 		reverseCovarianceMatrix;
-        double[][]		eiganVectors;
+        double[][]		eigenVectors;
 
 		double[] 		newWeights;
 		double[][] 		allPhis;
@@ -933,9 +933,9 @@ public class Main{
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
 
-		eiganVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, own_values);
+		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, own_values);
 
-		newWeights = calculateWeights(eiganVectors, newPhi);
+		newWeights = calculateWeights(eigenVectors, newPhi);
 
 
 		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
@@ -943,7 +943,7 @@ public class Main{
 		allEuclideanDistances = new double[allWeights.length];
 
 		for (int i = 0; i < allImagesVector.length; i++) {
-			allWeights[i] = calculateWeights(eiganVectors,allPhis[i]);
+			allWeights[i] = calculateWeights(eigenVectors,allPhis[i]);
 		}
 
 		for (int i = 0; i < allEuclideanDistances.length; i++) {
