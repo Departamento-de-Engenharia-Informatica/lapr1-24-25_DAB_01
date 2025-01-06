@@ -180,11 +180,10 @@ public class Main{
 			type = TypeOfExecution();
 			if (type == 0)
 				break ;
-			ownValues = OwnValues();
 			switch (type) {
 				case FUNC_1:
 					double[][] matrix;
-
+					ownValues = OwnValues();
 					path = GetPath("|Entre o caminho para o ficheiro:|\n");
 					matrix = CSVtoMatrix(path);
 					if(matrix == null)
@@ -195,10 +194,12 @@ public class Main{
 					doingFunctionOne(ownValues, matrix);
 					break;
 				case FUNC_2:
+					ownValues = OwnValues();
 					dirPath = GetPath("|Entre caminho para o diretório:|\n");
 					doingFunctionTwo(ownValues, dirPath);
 					break;
 				case FUNC_3:
+					ownValues = OwnValues();
 					path = GetPath("|Entre o caminho para o ficheiro:|\n");
 					dirPath = GetPath("|Entre caminho para o diretório:|\n");
 					SearchClosest(ownValues, path, dirPath);
@@ -224,6 +225,7 @@ public class Main{
 		outputFunction("|(1) Decomposição de Imagens            |\n");
 		outputFunction("|(2) Reconstrução de imagens            |\n");
 		outputFunction("|(3) Identificar mais próximo           |\n");
+		outputFunction("|(4) Testes Unitários                   |\n");
 		outputFunction("-----------------------------------------\n");
 
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
