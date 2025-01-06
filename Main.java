@@ -1,4 +1,3 @@
-package project.main;
 
 import	java.util.Scanner;
 import java.io.*;
@@ -20,9 +19,9 @@ public class Main{
 	public static final int MAX_VALUE_IN_CSV = 255;
 	public static final int MIN_VALUE_IN_CSV = 0;
 	public static final String PATH_WRITE_JPG = "Identificacao/";
-	public static final String PATH_WRITE_CSV = "Outputs/";
-	public static final String PATH_RECONSTRUTION = "ImagensReconstruidas/";
-	public static final String PATH_EIGENFACES = "Eigenfaces/";
+	public static final String PATH_WRITE_CSV = "Output/";
+	public static final String PATH_RECONSTRUCTION = "ImagensReconstruidas/";
+	public static final String PATH_EIGENFACES = "Eigenfaces/eigenfaces.csv";
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -65,6 +64,10 @@ public class Main{
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou <-1>");
+					return;
+				}
 				path = arguments[5];
 				pathWrite = arguments[6];
 				try{
@@ -98,7 +101,7 @@ public class Main{
 				}
 
 				break;
-			case 3:
+            case FUNC_3:
 				if (!CheckingArgs(arguments, FUNC_3))
 				{
 					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
@@ -106,6 +109,10 @@ public class Main{
 				}
 
 				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
+					return;
+				}
 				path = arguments[5];
 				dirPath = arguments[7];
 				pathWrite = arguments[8];
@@ -261,7 +268,7 @@ public class Main{
 		else {
 			try {
 				outputFile.write(toPrint);
-			} catch (IOException _) {
+			} catch (IOException e) {
 
 			}
 		}
@@ -275,7 +282,7 @@ public class Main{
 		matrix = ReadingCsv(filename);
 		if (matrix == null)
 		{
-			outputFunction("File does not exist!\n");
+			outputFunction("Ficheiro não existe ou formato incorreto!\n");
 			return (null);
 		}
 		return (matrix);
@@ -285,51 +292,62 @@ public class Main{
 	public static double[][] ReadingCsv(String filename)
 	{
 		File		file = new File(filename);
-		Scanner		ReadFile;
-		String		regex = "[,]";
-		String[]	Csv;
 		double[][]	toReturn = null;
-		int			noOfColumns = 0;
+		Scanner		ReadFile;
 		int			noOfLines;
-		int			j;
+		String[]	Csv;
 
-		j = 0;
+
+		noOfLines = GetNumLinesNonEmpty(file); // not square and numlines
+
+		if (noOfLines <= 0)
+			return null;
 		try {
 			ReadFile = new Scanner(file);
 		} catch (FileNotFoundException e) {
 			return null;
 		}
 
-		noOfLines = GetNumLines(file);
-		if (noOfLines == -1)
-			return (null);
-		while (ReadFile.hasNextLine())
+		for (int j = 0; j < noOfLines; j++)
 		{
-			Csv = ReadFile.nextLine().split(regex);
+			Csv = (ReadFile.nextLine()).split("[,]");
 			if (j == 0)
+				toReturn = new double[noOfLines][Csv.length];
+			for (int i = 0; i < Csv.length; i++)
 			{
-				noOfColumns = Csv.length;
-				toReturn = new double[noOfLines][noOfColumns];
-			}
-			for (int i = 0; i < noOfColumns; i++)
 				toReturn[j][i] = Double.parseDouble(Csv[i]);
-			j++;
+			}
 		}
 
 		return (toReturn);
 	}
-
-	public static int GetNumLines(File file)
+	
+	public static int GetNumLinesNonEmpty(File file)
 	{
-		int	noOfLines;
+		String[]	splitedRead;
+		String		read;
+		int		noOfLines;
+		int		fstLine;
+		Scanner		ReadFile;
 
-		noOfLines = -1;
-		try (LineNumberReader	lnr = new LineNumberReader(new FileReader(file))){
-			lnr.skip(Long.MAX_VALUE);
-			noOfLines = lnr.getLineNumber();
-		} catch (IOException e) {
-			System.err.println("An I/O error occurred");
-			return (noOfLines);
+		noOfLines = 0;
+		fstLine = 0;
+		try {
+			ReadFile = new Scanner(file);
+		} catch (FileNotFoundException e) {
+			return -1;
+		}
+		while (ReadFile.hasNextLine())
+		{
+			read = ReadFile.nextLine();
+			if (read.isEmpty())
+				break ;
+			splitedRead = (read.trim()).split("[,]");
+			if (fstLine == 0)
+				fstLine = splitedRead.length;
+			if (fstLine != splitedRead.length)
+				return (-1);
+			noOfLines++;
 		}
 		return (noOfLines);
 	}
@@ -409,11 +427,11 @@ public class Main{
 
 		arrayOfCoordinates = new int[numberOfValues];
 		for (int i = 0; i < numberOfValues; i++) {
-			minValue = Math.abs(matrix[0][0]);
+			minValue = matrix[0][0];
 			coordinates = 0;
 			for (int j = 0; j < matrix[0].length; j++) {
 				if (Math.abs(matrix[j][j]) < minValue && !isValueInArray(j, arrayOfCoordinates)) {
-					minValue = Math.abs(matrix[j][j]);
+					minValue = matrix[j][j];
 					coordinates = j;
 				}
 			}
@@ -557,41 +575,40 @@ public class Main{
 		if (ownVs[0][0].length == decompressedMatrix.length || ownValues == -1) {
 			outputFunction("O Erro Absoluto Médio é :: 0\n");
 		} else {
-			outputFunction("O Erro Absoluto Médio é :: " + avgAbsolutError(matrix, decompressedMatrix) + "\n");
+			outputFunction("O Erro Absoluto Médio é :: " + String.format("%.2f",avgAbsolutError(matrix, decompressedMatrix)) + "\n");
 		}
 	}
 
-	public static void doingFunctionOne(int ownValues, double[][] matrix)
-	{
-		double[][] 		decompressedMatrix;
-		double[][][] 	ownVs;
+    public static void doingFunctionOne(int ownValues, double[][] matrix)
+    {
+        double[][]         decompressedMatrix;
+        double[][][]     ownVs;
 
-		outputFunction("\n|======================================================|");
-		outputFunction("\n|             Output from functionality 1:             |");
-		outputFunction("\n|======================================================|\n");
+        if (!(isSimetric(matrix)) && !(validMatrix(matrix)))
+        {
+            System.out.println("\nEsta matriz não é válida. Por favor certifica-se que o caminho dado corresponde à matriz correta.\n");
+            return ;
+        }
 
-		ownVs = Decomposition(ownValues, matrix);
-		decompressedMatrix = calculateDecompressedMatrix(ownVs[0], ownVs[1]);
+        ownVs = Decomposition(ownValues, matrix);
+        decompressedMatrix = calculateDecompressedMatrix(ownVs[0], ownVs[1]);
 
-		printDecomposition(ownVs, decompressedMatrix, ownValues, matrix);
-		matrixToCSV(decompressedMatrix, PATH_WRITE_CSV + "outputFromExec.csv");
-	}
+        printDecomposition(ownVs, decompressedMatrix, ownValues, matrix);
+        matrixToCSV(decompressedMatrix, PATH_WRITE_CSV + "outputFromExec.csv");
+    }
 
 	//=========2=========//
 	public static void doingFunctionTwo(int precisionValues, String dirPath)
 	{
-		double[][]			reconstructionMatrix;
+		double[][]		reconstructionMatrix;
 
-
-		double				averageAbsoluteError;
-		double[]			averageVector;
-		double[][]			allPhis;
-		double[][]			allWeights;
-		double[][]			matrixInVector;
-		double[][]			reverseCovarianceMatrix;
-		double[][]			eigenVectors;
-		String[]			PathToCompare;
-		String[]			csvFilesInFolder;
+        double[]		averageVector;
+        double[][]		matrixInVector;
+		double[][]		allPhis;
+		double[][]		allWeights;
+        double[][]      reverseCovarianceMatrix;
+        double[][]      eigenVectors;
+        String[]        csvFilesInFolder;
 
 
         csvFilesInFolder = ReadingDir(dirPath);
@@ -618,33 +635,27 @@ public class Main{
 	public static void outputFunctionTwo(double[] avgVector, double[][] reverseCovMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors){
 
 		outputFunction("\n|======================================================|");
-		outputFunction("\n|             Output from functionality 2:             |");
+		outputFunction("\n|              Saída da funcionalidade 2:              |");
 		outputFunction("\n|======================================================|\n");
 
-		outputFunction(String.format("Number of eigenfaces used: %d", precisionValues));
+		outputFunction(String.format("Número de eigenfaces usadas: %d", eigenVectors.length));
 
-		outputFunction("\nAverage Vector:\n");
+        outputFunction("\nVetor Médio:\n");
 		printVector(avgVector);
 
-		outputFunction("\nCovariance Matrix\n");
+		outputFunction("\nMatriz de Covariância\n");
 		printMatrix(reverseCovMatrix);
 
-		outputFunction("Weights used: \n");
+		outputFunction("Pesos Usados: \n");
 		printMatrix(allWeights);
 
-		matrixToCSV(eigenVectors, "Eigenfaces/eigenfaces.csv");
-
-		try{
-			matrixToJPG(eigenVectors, PATH_EIGENFACES+"eigenfaces.jpg");
-		}catch (IOException e){
-
-		}
+//		matrixToCSV(eigenVectors, PATH_EIGENFACES);
 
 		for(int i = 0; i < reconstructionMatrix.length; i++){
 			try{
 				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.csv", i));
 				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.jpg", i));
-			}catch (IOException _){
+			}catch (IOException e){
 
 			}
 		}
@@ -652,17 +663,28 @@ public class Main{
 
 
 	public static double[][] AllImgsInVector(String[] files)
-	{
-		double[][]		allImgsInVector;
-		int				fileLength;
+    {
+        double[][]        allImgsInVector;
+		double[][]			imgInMatrix;
+        int                fileLength;
 
-		fileLength = files.length;
-		allImgsInVector = new double[fileLength][];
-		for (int i = 0; i < fileLength; i++)
-			allImgsInVector[i] = MatrixToVerticalVector(CSVtoMatrix(files[i]));
-		//printMatrix(allImgsInVector);
-		return (allImgsInVector);
-	}
+        fileLength = files.length;
+        allImgsInVector = new double[fileLength][];
+        for (int i = 0; i < fileLength; i++)
+        { 
+			imgInMatrix = CSVtoMatrix(files[i]);
+            if(!(validMatrix(imgInMatrix)))
+            {
+                System.out.println("\nEsta matriz não é válida. Por favor certifique-se de que introduziu o caminho correto para o diretório pretendido.\n");
+                return null;
+            }
+
+
+            allImgsInVector[i] = MatrixToVerticalVector(imgInMatrix);
+        }
+        return (allImgsInVector);
+    }
+
 
 	public static double[] CalculateMediumVector(double[][] allImgsInVector)
 	{
@@ -699,34 +721,30 @@ public class Main{
         return matrix;
 	}
 
-	public static double[][] buildReverseCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector)
+	public static double[][] buildReverseCovarianceMatrix(double[][] allPhis)
 	{
 		double[][] 		matrix;
-		double[][] 		reverseCovarianceMatrix;
 
-		matrix = calculateAllPhis(allImagesMatrix, mediumVector);
+		matrix = matrixMulti(allPhis, matrixTranspose(allPhis));
 
-		reverseCovarianceMatrix = matrixMulti(matrix, matrixTranspose(matrix));
-
-		return reverseCovarianceMatrix;
+		return matrix;
 	}
 
-	public static double[][] getEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allImagesMatrix, double[] mediumVector,int ownValues){
+	public static double[][] getEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix, double[][] allPhis, int precisionValues){
 
 		double[][][]		decomposedReverseCovarianceMatrix;
 		double[][]			eigenVectorsOfReverseCovarianceMatrix;
 		double[][]			eigenVectorsOfCovarianceMatrix;
-		double[][]			allPhis;
 
-		decomposedReverseCovarianceMatrix = Decomposition(ownValues, reverseCovarianceMatrix);
+		decomposedReverseCovarianceMatrix = Decomposition(precisionValues, reverseCovarianceMatrix);
 		eigenVectorsOfReverseCovarianceMatrix = decomposedReverseCovarianceMatrix[0];
-
-		allPhis = calculateAllPhis(allImagesMatrix, mediumVector);
 
 		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
 
 
 		eigenVectorsOfCovarianceMatrix = matrixTranspose(eigenVectorsOfCovarianceMatrix);
+
+		matrixToCSV(eigenVectorsOfCovarianceMatrix, PATH_EIGENFACES);
 
 
 		for (int i = 0; i < eigenVectorsOfCovarianceMatrix.length; i++) {
@@ -745,29 +763,22 @@ public class Main{
 		double		sum;
 
 		sum = 0;
-		for (int i = 0; i < vector.length; i++) {
-			sum += Math.pow(vector[i], 2);
-		}
+        for (double value : vector) {
+            sum += Math.pow(value, 2);
+        }
 		if (sum == 0){
 			return 0;
 		}
 		return Math.sqrt(sum);
 	}
 
-	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[] averageVector, double[][] allImagesInVector)
+	public static double[][] BuildReconstructionMatrix(double[][] eigenVectors, double[][] allPhis, double[][] allWeights, double[] averageVector, int eigenVectorLength)
 	{
 		double[][] 		reconstructionMatrix;
-		double[][] 		allWeights;
-		double[][]		allPhis;
 
+		reconstructionMatrix = new double[allPhis.length][allPhis[0].length];
 
-		reconstructionMatrix = new double[allImagesInVector.length][allImagesInVector[0].length];
-
-		allPhis = calculateAllPhis(allImagesInVector, averageVector);
-		allWeights = calculateAllWeights(allPhis, eigenVectors, allImagesInVector);
-
-
-        for (int i = 0; i < allImagesInVector.length; i++) {
+        for (int i = 0; i < allPhis.length; i++) {
 			for (int j = 0; j < eigenVectorLength; j++) {
 				reconstructionMatrix[i] = vectorAdd(vectorMultConst(eigenVectors[j], allWeights[i][j]), reconstructionMatrix[i]);
 			}
@@ -808,12 +819,13 @@ public class Main{
         double[]         newPhi;
         double[]        adjustedMediumVector;
 
-		adjustedMediumVector = vectorMultConst(mediumVector, -1);
+        adjustedMediumVector = vectorMultConst(mediumVector, -1);
 
         newPhi = vectorAdd(imageVector, adjustedMediumVector); //subtraction
 
         return newPhi;
     }
+
 
 	public static double calculateEuclideanDistance(double[] vector1, double[] vector2){
 		double 		distance;
@@ -847,27 +859,27 @@ public class Main{
 	public static void outputsThirdFunctionality(String csvPath, String[] files, int own_values, double[] allEuclideanDistances, int indexOfMinEuclideanDistance, double[] newWeights, double[][] allWeights)
 	{
 		outputFunction("\n|======================================================|");
-		outputFunction("\n|             Output from functionality 3:             |");
+		outputFunction("\n|              Saída da funcionalidade 3:              |");
 		outputFunction("\n|======================================================|\n");
 
-		outputFunction("Own values = " + own_values + "\n");
+		outputFunction("Valores Próprios = " + own_values + "\n");
 
-		outputFunction("\n\nOmega new vector:\n");
+		outputFunction("\n\nVetor Omega novo:\n");
 		printVector(newWeights);
 
-		outputFunction("\n\nAll weights:\n");
+		outputFunction("\n\nTodos os Pesos:\n");
 		for(int i = 0; i < allWeights.length; i++){
 			outputFunction(files[i]+":\t");
 			printVector(allWeights[i]);
 		}
 
-		outputFunction("\n\nEuclidian Distances between images:\n");
+		outputFunction("\n\nDistância Euclidiana entre imagens:\n");
 		for (int i = 0; i < allEuclideanDistances.length; i++)
-			outputFunction(files[i] + "\tand\t" + csvPath + " = " + allEuclideanDistances[i] + "\n");
+			outputFunction(files[i] + "\te\t" + csvPath + " = " + allEuclideanDistances[i] + "\n");
 
 		try {
 			matrixToJPG(ReadingCsv(files[indexOfMinEuclideanDistance]), PATH_WRITE_JPG + "outputImgFromExec.jpg");
-		} catch (IOException _) {
+		} catch (IOException e) {
 		}
 	}
 
@@ -896,7 +908,7 @@ public class Main{
 		allImagesVector = AllImgsInVector(files);
 		if(allImagesVector == null){
 			return ;
-
+		}
 		mediumVector = CalculateMediumVector(allImagesVector);
 
 		imageMatrix = CSVtoMatrix(csvPath);
@@ -907,9 +919,11 @@ public class Main{
 
 		newPhi = calculateNewPhi(imageVector, mediumVector);
 		if(newPhi == null)
+		{	
 			return ;
+		}
 
-		covarianceMatrix = buildReverseCovarianceMatrix(allImagesVector, mediumVector);
+		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
 
@@ -917,7 +931,6 @@ public class Main{
 
 		newWeights = calculateWeights(eigenVectors, newPhi);
 
-		allPhis = calculateAllPhis(allImagesVector, mediumVector);
 
 		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
 
@@ -933,6 +946,24 @@ public class Main{
 
 		indexOfMinEuclideanDistance = getIndexOfMinValueInArray(allEuclideanDistances);
 		outputsThirdFunctionality(csvPath, files, own_values, allEuclideanDistances, indexOfMinEuclideanDistance, newWeights, allWeights);
+	}
+
+	public static double[][] vectorToMatrix(double[] vector){
+		int matrixSidesLen;
+
+		matrixSidesLen = (int) Math.sqrt(vector.length);
+
+		double[][] matrix = new double[matrixSidesLen][matrixSidesLen];
+
+		int columnOffset = 0;
+		for(int i = 0; i < matrixSidesLen; i++){
+			for(int j = 0; j < matrixSidesLen; j++){
+				matrix[j][i] = vector[columnOffset+j];
+			}
+			columnOffset += matrixSidesLen;
+		}
+
+		return matrix;
 	}
 
 	//=============Matrix Operations=============//
@@ -987,6 +1018,21 @@ public class Main{
 		return (matrix1);
 	}
 
+	public static double[][] matrixMultiConst(double[][] matrix1, int value)
+	{
+		int			martixLen;
+		int			matrixHeight;
+
+		martixLen = matrix1[0].length;
+		matrixHeight = matrix1.length;
+
+
+		for (int i = 0; i < matrixHeight; i++)
+			for (int j = 0; j < martixLen; j++)
+				matrix1[i][j] = matrix1[i][j] * value;
+		return (matrix1);
+	}
+
 	public static double[][] matrixTranspose(double[][] matrix)
 	{
 		int			martixLen;
@@ -1005,25 +1051,6 @@ public class Main{
 	}
 
 	//=============Vector Operations=============//
-
-	public static double[][] vectorToMatrix(double[] vector){
-		int matrixSidesLen;
-
-		matrixSidesLen = (int) Math.sqrt(vector.length);
-
-		double[][] matrix = new double[matrixSidesLen][matrixSidesLen];
-
-		int columnOffset = 0;
-		for(int i = 0; i < matrixSidesLen; i++){
-			for(int j = 0; j < matrixSidesLen; j++){
-				matrix[j][i] = vector[columnOffset+j];
-			}
-			columnOffset += matrixSidesLen;
-		}
-
-		return matrix;
-	}
-
 	public static double[] MatrixToVerticalVector(double[][] matrix)
 	{
 		int 	 columnNumber;
@@ -1102,7 +1129,6 @@ public class Main{
 		return (multipliedVector);
 	}
 
-
 	//=============Display Matrix=============//
 	public static void printMatrix(double[][] matrix)
 	{
@@ -1144,7 +1170,7 @@ public class Main{
 				for(int j = 0; j < width; j++){
 					line += (int) matrix[i][j];
 
-					if(j != width-1){
+					if(j != width - 1){
 						line += ",";
 					}
 				}
@@ -1154,7 +1180,7 @@ public class Main{
 			outputFile.close();
 			return true;
 		} catch (IOException e) {
-			outputFunction("Not possible to create the file!\n");
+			outputFunction("Não foi possível criar o ficheiro!\n");
 			return false;
 		}
 	}
@@ -1178,7 +1204,6 @@ public class Main{
 				int intensity = (int) Math.round(matrix[y][x]);
 				if (intensity < MIN_VALUE_IN_CSV ) {
 					intensity = 0;
-					//throw new IllegalArgumentException("Pixel intensity must be between 0 and 255.");
 				}else if (intensity > MAX_VALUE_IN_CSV){
 					intensity = 255;
 				}
@@ -1238,9 +1263,20 @@ public class Main{
 		return (true);
 	}
 
+	public static boolean isOwnValueValid(int ownValue){
 
+		if (ownValue == MIN_OWN_VALUE){
+			return true;
+		} else return ownValue > 0;
+	}
 
-
-	 //===================Testes Unitarios===================//
-
+	// true if valid
+	public static boolean validMatrix(double[][] matrix)
+    {
+		if (matrix == null)
+			return false;
+        if (isSquared(matrix) && matrix.length <= MAX_SIZE_IMG)
+            return true;
+        return false;
+    }
 }
