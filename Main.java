@@ -52,15 +52,16 @@ public class Main{
 
 		if (!arguments[0].equals("-f"))
 		{
-			outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+			outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
 		switch (type) {
-			case 1:
+			case FUNC_1:
 				if (!CheckingArgs(arguments, FUNC_1))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
+	\n");
 					return;
 				}
 
@@ -79,10 +80,11 @@ public class Main{
 					outputFunction("Not possible to write, closing program!");
 				}
 				break ;
-			case 2:
+			case FUNC_2:
 				if (!CheckingArgs(arguments, FUNC_2))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
+	\n");
 					return ;
 				}
 
@@ -105,7 +107,8 @@ public class Main{
             case FUNC_3:
 				if (!CheckingArgs(arguments, FUNC_3))
 				{
-					outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
+	\n");
 					return ;
 				}
 
@@ -127,7 +130,8 @@ public class Main{
 
 				break ;
 			default:
-				outputFunction("You've entered some wrong argument!! Check it and try again!!\n");
+				outputFunction("Entrou um argumento errado. Cheque e teste novamente!
+\n");
         }
     }
 
@@ -207,6 +211,7 @@ public class Main{
 				case FUNC_4:
 					unitTest();
 					break;
+				default:
 			}
 		}
 		outputFunction("Program ending... Thanks for using it!!\n");
@@ -243,7 +248,7 @@ public class Main{
 
 		read = MIN_OWN_VALUE - 1;
 		outputFunction("---------------------------------------------------------------\n");
-		System.out.print("|Entre o número de valores próprios a serem utilizadosEnter:|\n");
+		System.out.print("|Entre o número de valores próprios a serem utilizados:|\n");
 		outputFunction("---------------------------------------------------------------\n");
 		while (read == 0 || read < MIN_OWN_VALUE)
 		{
