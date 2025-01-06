@@ -1,4 +1,5 @@
 
+import java.util.Arrays;
 import	java.util.Scanner;
 import java.io.*;
 
@@ -282,169 +283,203 @@ public class Main{
 	}
 
 	//=============Testes Unitarios==============//
+
+	//=============Input Values=============//
+	public static final double[][] MAINMATRIX = {{2,0}, {0,3}};
+	public static final double[][] NONSQUAREMATRIX = {{4,5},{1}};
+	public static final double[][] SIMETRICMATRIX = {{3,5}, {5,3}};
+	public static final int ARBITRARYVALUE1 = 63;
+	public static final int ARBITRARYVALUE2 = 999;
+	public static final int[] VECTOR1 = {80,63,2};
+	public static final double[] VECTOR2 = {2,0,0,3};
+	public static final double[] VECTOR3 = {2,3};
+	public static final double[] VECTOR4 = {2,0,0,3};
+	public static final double[] VECTOR5 = {2,0,0,3};
+	public static final double[][] TESTALLIMAGES = {{5,6}, {10,12}};
+	public static final double[][] MATRIXOFEIGENVECTORS = {{5,9}, {1,4}};
+	public static final double[][] TESTALLPHIS = {{1,1}, {2,2}};
+	public static final double[][] REVERSECOVARIANCEMATRIX = {{2,4}, {15,8}};
+	public static final double SQUAREROOT13 = Math.sqrt(13);
+
+
+
+
+	//=============Expected Values=============//
+	public static final int[] expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1 = {0};
+	public static final int[] expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix2 = {0,1};
+	public static final double[][] expectedResultForTestGetEigenValuesSubMatrix = {{3}};
+	public static final double[][] expectedResultForTestGetEigenVectorsSubMatrix = {{9},{4}};
+	public static final double expectedResultForTestAvgAbsolutError = 0;
+	public static final double[][] expectedResultForTestCalculateDecompressedMatrix = {{293,118}, {118,50}};
+	public static final double[] expectedResultForTestCalculateMediumVector = {7.5, 9};
+	public static final double[][] expectedResultForTestCalculateAllPhis = {{-2.5,-3}, {2.5,3}};
+	public static final double[][] expectedResultForTestBuildReverseCovarianceMatrix= {{2,4}, {4,8}};
+	public static final double[][] expectedResultForTestGetEigenVectorsOfCovarianceMatrix = {{0.7071067811865475, 0.7071067811865475}, {-0.7071067811865476, -0.7071067811865476}};
+	public static final double[][] expectedResultForTestBuildReconstructionMatrix = {{82.5, 155.0}, {157.5, 301.0}};
+
+	public static final double[][] expectedResultForTestCalculateAllWeights = {{14.0, 5.0}, {28.0, 10.0}};
+	public static final double[] expectedResultForTestNormalizeVector = {2/SQUAREROOT13,0,0,3/SQUAREROOT13};
+	public static final double expectedResultForTestScalarProduct = 13;
+	public static final double[] expectedResultForTestVectorAdd = {4,0,0,6};
+	public static final double[][] expectedResultForTestMatrixMulti = {{4,0},{0,9}};
+	public static final double[] expectedResultForTestCalculateNewPhi = {-5.5,-6};
+	public static final double[] expectedResultForTestCalculateWeights = {-81.5, -29.5};
+	public static final double[][] MAINMATRIXTRANSPOSE = {{2,0}, {0,3}};
+
+
 	public static void unitTest()
 	{
 		System.out.println("==================================");
 		System.out.println("\t\tTeste Unitarios\t\t");
 		System.out.println("==================================");
 		System.out.println("1-testIsSimetric");
-			if (testIsSimetric(null, hasOutputInFile) == true)
+			if (testIsSimetric(SIMETRICMATRIX, true))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-			if (testIsSimetric(null, hasOutputInFile) == true) //
+			if (testIsSimetric(MATRIXOFEIGENVECTORS, false)) //
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("2-testIsSquared");
-			if (testIsSquared() == true)
+			if (testIsSquared(MAINMATRIX, true))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-			if (testIsSquared() == true) //
+			if (testIsSquared(NONSQUAREMATRIX, false)) //
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("3-testIsValueInArray");
-			if (testIsValueInArray() == true)
+			if (testIsValueInArray(ARBITRARYVALUE1, VECTOR1, true))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-			if (testIsValueInArray() == true) //
+			if (testIsValueInArray(ARBITRARYVALUE2, VECTOR1, false)) //
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("4-testGetCoordinatesOfMinValuesOfDiagonalMatrix");
-			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix() == true)
+			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix(MAINMATRIX, 1, expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix() == true) //
+			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix(MAINMATRIX, 2, expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix2)) //
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("5-testGetEigenValuesSubMatrix");
-			if (testGetEigenValuesSubMatrix() == true)
+			if (testGetEigenValuesSubMatrix(expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1, MAINMATRIX, expectedResultForTestGetEigenValuesSubMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("6-testGetEigenVectorsSubMatrix");
-			if (testGetEigenVectorsSubMatrix() == true)
+			if (testGetEigenVectorsSubMatrix(expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1, MATRIXOFEIGENVECTORS, expectedResultForTestGetEigenVectorsSubMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("7-testAvgAbsolutError");
-			if (testAvgAbsolutError() == true)
+			if (testAvgAbsolutError(MAINMATRIX, MAINMATRIX, expectedResultForTestAvgAbsolutError))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("8-testCalculateDecompressedMatrix");
-			if (testCalculateDecompressedMatrix() == true)
+			if (testCalculateDecompressedMatrix(MATRIXOFEIGENVECTORS, MAINMATRIX, expectedResultForTestCalculateDecompressedMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
 		System.out.println("9-testCalculateMediumVector");
-			if (testCalculateMediumVector() == true)
+			if (testCalculateMediumVector(TESTALLIMAGES, expectedResultForTestCalculateMediumVector))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("11-testCalculateAllPhis");
-			if (testCalculateAllPhis() == true)
+		System.out.println("10-testCalculateAllPhis");
+			if (testCalculateAllPhis(TESTALLIMAGES, expectedResultForTestCalculateMediumVector, expectedResultForTestCalculateAllPhis))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("12-testBuildReverseCovarianceMatrix");
-			if (testBuildReverseCovarianceMatrix() == true)
+		System.out.println("11-testBuildReverseCovarianceMatrix");
+			if (testBuildReverseCovarianceMatrix(TESTALLPHIS, expectedResultForTestBuildReverseCovarianceMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("13-testGetEigenVectorsOfCovarianceMatrix");
-			if (testGetEigenVectorsOfCovarianceMatrix() == true)
+		System.out.println("12-testGetEigenVectorsOfCovarianceMatrix");
+			if (testGetEigenVectorsOfCovarianceMatrix(REVERSECOVARIANCEMATRIX, TESTALLPHIS, ARBITRARYVALUE1, expectedResultForTestGetEigenVectorsOfCovarianceMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("14-testBuildReconstructionMatrix");
-			if (testBuildReconstructionMatrix() == true)
+		System.out.println("13-testBuildReconstructionMatrix");
+			if (testBuildReconstructionMatrix(MATRIXOFEIGENVECTORS, MATRIXOFEIGENVECTORS.length, TESTALLPHIS, calculateAllWeights(TESTALLPHIS, MATRIXOFEIGENVECTORS, TESTALLIMAGES), expectedResultForTestCalculateMediumVector, expectedResultForTestBuildReconstructionMatrix))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("15-testCalculateAllWeights");
-			if (testCalculateAllWeights() == true)
+		System.out.println("14-testCalculateAllWeights");
+		if (testCalculateAllWeights(TESTALLPHIS, MATRIXOFEIGENVECTORS, TESTALLPHIS, expectedResultForTestCalculateAllWeights))
+			System.out.println("✅");
+		else
+			System.out.println("❌");
+		System.out.println("15-TestCalculateWeights");
+			if (testCalculateWeights(MATRIXOFEIGENVECTORS, expectedResultForTestCalculateNewPhi, expectedResultForTestCalculateWeights))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("16-TestCalculateWeights");
-			if (TestCalculateWeights() == true)
+		System.out.println("16-testCalculateNewPhi");
+			if (testCalculateNewPhi(VECTOR3, expectedResultForTestCalculateMediumVector, expectedResultForTestCalculateNewPhi))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("17-testCalculateNewPhi");
-			if (testCalculateNewPhi() == true)
+		System.out.println("17-testCalculateEuclideanDistance");
+			if (testCalculateEuclideanDistance(VECTOR2, VECTOR2, 0))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("18-testCalculateEuclideanDistance");
-			if (testCalculateEuclideanDistance() == true)
+		System.out.println("18-getIndexOfMinValueInArray");
+			if (getIndexOfMinValueInArray(VECTOR2, 1))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("19-getIndexOfMinValueInArray");
-			if (getIndexOfMinValueInArray() == true)
+		System.out.println("19-testMatrixMulti");
+			if (testMatrixMulti(MAINMATRIX, MAINMATRIX, expectedResultForTestMatrixMulti))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("20-testMatrixAdd");
-			if (testMatrixAdd() == true)
+		System.out.println("20-testMatrixTranspose");
+			if (testMatrixTranspose(MAINMATRIX, MAINMATRIXTRANSPOSE))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("21-testMatrixMulti");
-			if (testMatrixMulti() == true)
+		System.out.println("21-testVectorAdd");
+			if (testVectorAdd(VECTOR2, VECTOR2, expectedResultForTestVectorAdd))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("22-testMatrixDivConst");
-			if (testMatrixDivConst() == true)
+		System.out.println("22-testScalarProduct");
+			if (testScalarProduct(VECTOR2, VECTOR2, expectedResultForTestScalarProduct))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("23-testMatrixTranspose");
-			if (testMatrixTranspose() == true)
+		System.out.println("23-testVectorDivConst");
+			if (testVectorDivConst(VECTOR2, 1, VECTOR2))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("24-testVectorAdd");
-			if (testVectorAdd() == true)
+		System.out.println("24-testVectorMultConst");
+			if (testVectorMultConst(VECTOR2, 1, VECTOR2))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("25-testScalarProduct");
-			if (testScalarProduct() == true)
+		System.out.println("25-testNormalizeVector");
+			if (testNormalizeVector(VECTOR2, expectedResultForTestNormalizeVector))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("26-testVectorDivConst");
-			if (testVectorDivConst() == true)
+		System.out.println("26-testGetVectorNorm");
+			if (testGetVectorNorm(VECTOR4, SQUAREROOT13))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
-		System.out.println("27-testVectorMultConst");
-			if (testVectorMultConst() == true)
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("28-testNormalizeVector");
-			if (testNormalizeVector() == true)
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("29-testGetVectorNorm");
-			if (testGetVectorNorm() == true)
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("30-testVectorToMatrix");
-		if (testVectorToMatrix() == true)
+		System.out.println("27-testVectorToMatrix");
+		if (testVectorToMatrix(VECTOR5, MAINMATRIX))
 				System.out.println("✅");
 			else
 				System.out.println("❌");
@@ -603,10 +638,13 @@ public class Main{
 
 		arrayOfCoordinates = new int[numberOfValues];
 		for (int i = 0; i < numberOfValues; i++) {
-			minValue = matrix[0][0];
+			arrayOfCoordinates[i] = -1;
+		}
+		for (int i = 0; i < numberOfValues; i++) {
+			minValue = Integer.MAX_VALUE;
 			coordinates = 0;
 			for (int j = 0; j < matrix[0].length; j++) {
-				if (Math.abs(matrix[j][j]) < minValue && !isValueInArray(j, arrayOfCoordinates)) {
+				if (!isValueInArray(j, arrayOfCoordinates) && Math.abs(matrix[j][j]) < minValue) {
 					minValue = matrix[j][j];
 					coordinates = j;
 				}
@@ -726,6 +764,7 @@ public class Main{
 		double[][] 		intermediaryMatrix;
 
 		intermediaryMatrix = matrixMulti(eigenVectors, eigenValues);
+
 
 		return matrixMulti(intermediaryMatrix, matrixTranspose(eigenVectors));
 	}
@@ -915,13 +954,12 @@ public class Main{
 		decomposedReverseCovarianceMatrix = Decomposition(precisionValues, reverseCovarianceMatrix);
 		eigenVectorsOfReverseCovarianceMatrix = decomposedReverseCovarianceMatrix[0];
 
-		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
 
+		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
 
 		eigenVectorsOfCovarianceMatrix = matrixTranspose(eigenVectorsOfCovarianceMatrix);
 
 		matrixToCSV(eigenVectorsOfCovarianceMatrix, PATH_EIGENFACES);
-
 
 		for (int i = 0; i < eigenVectorsOfCovarianceMatrix.length; i++) {
 			eigenVectorsOfCovarianceMatrix[i] = normalizeVector(eigenVectorsOfCovarianceMatrix[i]);
@@ -1143,19 +1181,6 @@ public class Main{
 	}
 
 	//=============Matrix Operations=============//
-	public static double[][] matrixAdd(double[][] matrix1, double[][] matrix2)
-	{
-		int			martixLen;
-		int			matrixHeight;
-
-		martixLen = matrix1[0].length;
-		matrixHeight = matrix1.length;
-		for (int i = 0; i < matrixHeight; i++)
-			for (int j = 0; j < martixLen; j++)
-				matrix1[i][j] = matrix1[i][j] + matrix2[i][j];
-		return (matrix1);
-	}
-
 	public static double[][] matrixMulti(double[][] matrix1, double[][] matrix2)
 	{
 		double[][]	matrixResult;
@@ -1177,21 +1202,6 @@ public class Main{
 			}
 		}
 		return (matrixResult);
-	}
-
-	public static double[][] matrixDivConst(double[][] matrix1, int value)
-	{
-		int			martixLen;
-		int			matrixHeight;
-
-		martixLen = matrix1[0].length;
-		matrixHeight = matrix1.length;
-
-
-		for (int i = 0; i < matrixHeight; i++)
-			for (int j = 0; j < martixLen; j++)
-				matrix1[i][j] = matrix1[i][j] / value;
-		return (matrix1);
 	}
 
 	public static double[][] matrixMultiConst(double[][] matrix1, int value)
@@ -1402,10 +1412,12 @@ public class Main{
 	}
 
 	public static boolean isSquared(double[][] matrix){
-		if (matrix.length == matrix[0].length) {
-			return true;
+		for (int i = 0; i < matrix.length; i++) {
+			if (matrix.length != matrix[i].length) {
+				return false;
+			}
 		}
-		return false;
+		return true;
 	}
 
 	public static boolean matrixEquals(double[][] matrix1, double[][] matrix2)
@@ -1470,7 +1482,7 @@ public class Main{
 	{
 		boolean result = isSquared(matrix);
 
-		return result == expected;
+		return (result == expected);
 	}
 
 	public static boolean testIsValueInArray(double value, int[] array, boolean expected) {
@@ -1506,7 +1518,7 @@ public class Main{
 	public static boolean  testGetEigenVectorsSubMatrix(int[] arrayOfCoordinates, double[][] matrix, double[][] expected){
 		double[][] result = getEigenVectorsSubMatrix(arrayOfCoordinates, matrix);
 
-		return matrixEquals(result, matrix);
+		return matrixEquals(result, expected);
 	}
 
 	public static boolean testAvgAbsolutError(double[][] matrix1, double[][] matrix2, double expected)
@@ -1523,10 +1535,7 @@ public class Main{
 	{
 		double[][] result = calculateDecompressedMatrix(eigenVectors, eigenValues);
 
-		if(matrixEquals(result, expected))
-			return true;
-		else
-			return false;
+        return matrixEquals(result, expected);
 	}
 
 	public static boolean testCalculateMediumVector(double[][] allImgsInVector, double[] expected){
@@ -1566,7 +1575,7 @@ public class Main{
 		return matrixEquals(result, expected);
 	}
 
-	public static boolean TestCalculateWeights(double[][] eigenVectors, double[] phi, double[] expected){
+	public static boolean testCalculateWeights(double[][] eigenVectors, double[] phi, double[] expected){
 		double[] result = calculateWeights(eigenVectors, phi);
 
 		return vectorEquals(result, expected);
@@ -1592,30 +1601,17 @@ public class Main{
 
 	//===================Matrix===================//
 
-	public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
-	{
-		matrix1 = matrixAdd(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
-	}
-
 	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
 	{
 		matrix1 = matrixMulti(matrix1, matrix2);
 		return (matrixEquals(matrix1, expected));
 	}
 
-	public static boolean testMatrixDivConst(double[][] matrix1, int value, double[][] expected)
-	{
-
-		matrix1 = matrixMultiConst(matrix1, value);
-		return (matrixEquals(matrix1, expected));
-	}
-
 
 	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
 	{
-		matrix1 = matrixTranspose(matrix1);
-		return (matrixEquals(matrix1, expected));
+		double[][] matrix2 = matrixTranspose(matrix1);
+		return (matrixEquals(matrix2, expected));
 	}
 
 	//===================Vectors===================//
@@ -1630,10 +1626,7 @@ public class Main{
 	{
 		double result = scalarProduct(vector1, vector2);
 
-		if(result == expected)
-			return true;
-		else
-			return false;
+        return result == expected;
 	}
 
 	public static boolean testVectorDivConst(double[] vector, int value, double[] expected)
@@ -1651,7 +1644,7 @@ public class Main{
 	public static boolean testNormalizeVector(double[] vector, double[] expected){
 		double[] result = normalizeVector(vector);
 
-		return vectorEquals(vector, expected);
+		return vectorEquals(result, expected);
 	}
 
 	public static boolean testGetVectorNorm(double[] vector, double expected){
@@ -1665,7 +1658,5 @@ public class Main{
 
 		return matrixEquals(result, expected);
 	}
-
-
 
 }
