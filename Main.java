@@ -60,8 +60,7 @@ public class Main{
 			case FUNC_1:
 				if (!CheckingArgs(arguments, FUNC_1))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
-	\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
 					return;
 				}
 
@@ -83,8 +82,7 @@ public class Main{
 			case FUNC_2:
 				if (!CheckingArgs(arguments, FUNC_2))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
-	\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
 					return ;
 				}
 
@@ -107,8 +105,7 @@ public class Main{
             case FUNC_3:
 				if (!CheckingArgs(arguments, FUNC_3))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!
-	\n");
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
 					return ;
 				}
 
@@ -130,8 +127,7 @@ public class Main{
 
 				break ;
 			default:
-				outputFunction("Entrou um argumento errado. Cheque e teste novamente!
-\n");
+				outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
         }
     }
 
