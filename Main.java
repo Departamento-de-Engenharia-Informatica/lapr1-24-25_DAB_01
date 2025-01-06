@@ -26,7 +26,7 @@ public class Main{
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
-	public static final int MAX_TYPE_EXEC = 3;
+	public static final int MAX_TYPE_EXEC = 4;
 
 	public static final Scanner input = new Scanner(System.in);
 
