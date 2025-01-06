@@ -15,6 +15,7 @@ public class Main{
 	public static final int FUNC_1 = 1;
 	public static final int FUNC_2 = 2;
 	public static final int FUNC_3 = 3;
+	public static final int FUNC_4 = 4;
 	public static final int MAX_SIZE_IMG = 256;
 	public static final int MAX_VALUE_IN_CSV = 255;
 	public static final int MIN_VALUE_IN_CSV = 0;
@@ -184,23 +185,26 @@ public class Main{
 				case FUNC_1:
 					double[][] matrix;
 
-					path = GetPath("|Enter the file PATH of execution:|\n");
+					path = GetPath("|Entre o caminho para o ficheiro:|\n");
 					matrix = CSVtoMatrix(path);
 					if(matrix == null)
 					{
-						outputFunction("You've entered a bad csv file \n");
+						outputFunction("Entrou um mal ficheiro .csv \n");
 						return ;
 					}
 					doingFunctionOne(ownValues, matrix);
 					break;
 				case FUNC_2:
-					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
+					dirPath = GetPath("|Entre caminho para o diretório:|\n");
 					doingFunctionTwo(ownValues, dirPath);
 					break;
 				case FUNC_3:
-					path = GetPath("|Enter the file PATH of execution:|\n");
-					dirPath = GetPath("|Enter the dir PATH of execution:|\n");
+					path = GetPath("|Entre o caminho para o ficheiro:|\n");
+					dirPath = GetPath("|Entre caminho para o diretório:|\n");
 					SearchClosest(ownValues, path, dirPath);
+					break ;
+				case FUNC_4:
+					unitTest();
 					break;
 			}
 		}
@@ -212,21 +216,21 @@ public class Main{
 		int	read;
 
 		read = 100;
-		outputFunction("----------------------------------\n");
-		outputFunction("|        Menu of execution      |\n");
-		outputFunction("----------------------------------\n");
-		outputFunction("|Enter the type of execution:   |\n");
-		outputFunction("|(0) Exit Program               |\n");
-		outputFunction("|(1) Decomposition of images    |\n");
-		outputFunction("|(2) Rebuild images             |\n");
-		outputFunction("|(3) Identify closest           |\n");
-		outputFunction("----------------------------------\n");
+		outputFunction("-----------------------------------------\n");
+		outputFunction("|            Menu of execution          |\n");
+		outputFunction("-----------------------------------------\n");
+		outputFunction("|Entre Tipo de Execução:                |\n");
+		outputFunction("|(0) Sair do Programa                   |\n");
+		outputFunction("|(1) Decomposição de Imagens            |\n");
+		outputFunction("|(2) Reconstrução de imagens            |\n");
+		outputFunction("|(3) Identificar mais próximo           |\n");
+		outputFunction("-----------------------------------------\n");
 
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
 		{
 			read = input.nextInt();
 			if (!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
-				outputFunction("You've entered a wrong value. Try it again: \n");
+				outputFunction("Entrou um argumento errado. Tente novamente: \n");
 		}
 		return (read);
 	}
@@ -237,14 +241,14 @@ public class Main{
 
 		read = MIN_OWN_VALUE - 1;
 		outputFunction("---------------------------------------------------------------\n");
-		System.out.print("|Enter the number of own values that you want to use(columns):|\n");
+		System.out.print("|Entre o número de valores próprios a serem utilizadosEnter:|\n");
 		outputFunction("---------------------------------------------------------------\n");
 		while (read == 0 || read < MIN_OWN_VALUE)
 		{
 			read = input.nextInt();
 			input.nextLine();
 			if(read <= 0 && read != MIN_OWN_VALUE)
-				outputFunction("You need to enter a non zero positive number or <-1>. Try again!\n");
+				outputFunction("Vocẽ precisa de entrar um número positivo ou <-1>. Tente novamente!\n");
 		}
 		return read;
 	}
@@ -272,6 +276,175 @@ public class Main{
 
 			}
 		}
+	}
+
+	//=============Testes Unitarios==============//
+	public static void unitTest()
+	{
+		System.out.println("==================================");
+		System.out.println("\t\tTeste Unitarios\t\t");
+		System.out.println("==================================");
+		System.out.println("1-testIsSimetric");
+			if (testIsSimetric(null, hasOutputInFile) == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+			if (testIsSimetric(null, hasOutputInFile) == true) //
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("2-testIsSquared");
+			if (testIsSquared() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+			if (testIsSquared() == true) //
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("3-testIsValueInArray");
+			if (testIsValueInArray() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+			if (testIsValueInArray() == true) //
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("4-testGetCoordinatesOfMinValuesOfDiagonalMatrix");
+			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix() == true) //
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("5-testGetEigenValuesSubMatrix");
+			if (testGetEigenValuesSubMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("6-testGetEigenVectorsSubMatrix");
+			if (testGetEigenVectorsSubMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("7-testAvgAbsolutError");
+			if (testAvgAbsolutError() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("8-testCalculateDecompressedMatrix");
+			if (testCalculateDecompressedMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("9-testCalculateMediumVector");
+			if (testCalculateMediumVector() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("11-testCalculateAllPhis");
+			if (testCalculateAllPhis() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("12-testBuildReverseCovarianceMatrix");
+			if (testBuildReverseCovarianceMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("13-testGetEigenVectorsOfCovarianceMatrix");
+			if (testGetEigenVectorsOfCovarianceMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("14-testBuildReconstructionMatrix");
+			if (testBuildReconstructionMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("15-testCalculateAllWeights");
+			if (testCalculateAllWeights() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("16-TestCalculateWeights");
+			if (TestCalculateWeights() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("17-testCalculateNewPhi");
+			if (testCalculateNewPhi() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("18-testCalculateEuclideanDistance");
+			if (testCalculateEuclideanDistance() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("19-getIndexOfMinValueInArray");
+			if (getIndexOfMinValueInArray() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("20-testMatrixAdd");
+			if (testMatrixAdd() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("21-testMatrixMulti");
+			if (testMatrixMulti() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("22-testMatrixDivConst");
+			if (testMatrixDivConst() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("23-testMatrixTranspose");
+			if (testMatrixTranspose() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("24-testVectorAdd");
+			if (testVectorAdd() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("25-testScalarProduct");
+			if (testScalarProduct() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("26-testVectorDivConst");
+			if (testVectorDivConst() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("27-testVectorMultConst");
+			if (testVectorMultConst() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("28-testNormalizeVector");
+			if (testNormalizeVector() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("29-testGetVectorNorm");
+			if (testGetVectorNorm() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
+		System.out.println("30-testVectorToMatrix");
+		if (testVectorToMatrix() == true)
+				System.out.println("✅");
+			else
+				System.out.println("❌");
 	}
 
 	//=========Matrix Read=========//
@@ -321,7 +494,7 @@ public class Main{
 
 		return (toReturn);
 	}
-	
+
 	public static int GetNumLinesNonEmpty(File file)
 	{
 		String[]	splitedRead;
@@ -613,7 +786,7 @@ public class Main{
 
         csvFilesInFolder = ReadingDir(dirPath);
         if(AllImgsInVector(csvFilesInFolder) == null){
-            return ; 
+            return ;
         }
 
         matrixInVector = AllImgsInVector(csvFilesInFolder);
@@ -626,7 +799,7 @@ public class Main{
 		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, precisionValues);
 		allWeights = calculateAllWeights(allPhis, eigenVectors, matrixInVector);
 
-		
+
         reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectors.length);
 
 		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors);
@@ -671,7 +844,7 @@ public class Main{
         fileLength = files.length;
         allImgsInVector = new double[fileLength][];
         for (int i = 0; i < fileLength; i++)
-        { 
+        {
 			imgInMatrix = CSVtoMatrix(files[i]);
             if(!(validMatrix(imgInMatrix)))
             {
@@ -919,7 +1092,7 @@ public class Main{
 
 		newPhi = calculateNewPhi(imageVector, mediumVector);
 		if(newPhi == null)
-		{	
+		{
 			return ;
 		}
 
@@ -1279,4 +1452,217 @@ public class Main{
             return true;
         return false;
     }
+
+	//===================Unit tests===================//
+	//=============General Operations=============//
+
+	public static boolean testIsSimetric(double[][] matrix, boolean expected)
+	{
+		boolean result = isSimetric(matrix);
+
+		return (result == expected);
+	}
+
+	public static boolean testIsSquared(double[][] matrix, boolean expected)
+	{
+		boolean result = isSquared(matrix);
+
+		return result == expected;
+	}
+
+	public static boolean testIsValueInArray(double value, int[] array, boolean expected) {
+
+		return (expected == isValueInArray(value, array));
+
+	}
+
+	public static boolean testGetCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int value, int[] expected)
+	{
+
+		int[] result = getCoordinatesOfMinValuesOfDiagonalMatrix(matrix, value);
+
+		if(result.length == expected.length){
+			for(int i = 0; i < result.length; i++){
+				if(result[i] != expected[i])
+					return false;
+			}
+		}else{
+			return false;
+		}
+
+		return true;
+	}
+
+	public static boolean testGetEigenValuesSubMatrix(int[] arrayOfCoordinates, double[][] matrix, double[][] expected)
+	{
+		double[][] result = getEigenValuesSubMatrix(arrayOfCoordinates, matrix);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean  testGetEigenVectorsSubMatrix(int[] arrayOfCoordinates, double[][] matrix, double[][] expected){
+		double[][] result = getEigenVectorsSubMatrix(arrayOfCoordinates, matrix);
+
+		return matrixEquals(result, matrix);
+	}
+
+	public static boolean testAvgAbsolutError(double[][] matrix1, double[][] matrix2, double expected)
+	{
+		double result = avgAbsolutError(matrix1, matrix2);
+
+		if(result == expected)
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testCalculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues, double[][] expected)
+	{
+		double[][] result = calculateDecompressedMatrix(eigenVectors, eigenValues);
+
+		if(matrixEquals(result, expected))
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testCalculateMediumVector(double[][] allImgsInVector, double[] expected){
+		double[] result = CalculateMediumVector(allImgsInVector);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateAllPhis(double[][] allImagesMatrix, double[] mediumVector, double[][] expected){
+
+		double[][] result = calculateAllPhis(allImagesMatrix, mediumVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testBuildReverseCovarianceMatrix(double[][] allPhis, double[][] expected){
+		double[][] result = buildReverseCovarianceMatrix(allPhis);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testGetEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allPhis, int ownValues, double[][] expected){
+		double[][] result = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, ownValues);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testBuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[][] allPhis, double[][] allWeights, double[]averageVector, double[][] expected){
+		double[][] result = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectorLength);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testCalculateAllWeights(double[][] allPhis, double[][] eigenVectors, double[][] allImagesVector, double[][] expected){
+		double[][] result = calculateAllWeights(allPhis, eigenVectors, allImagesVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean TestCalculateWeights(double[][] eigenVectors, double[] phi, double[] expected){
+		double[] result = calculateWeights(eigenVectors, phi);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateNewPhi(double[] imageVector, double[] mediumVector, double[] expected){
+		double[] result = calculateNewPhi(imageVector, mediumVector);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateEuclideanDistance(double[] vector1, double[] vector2, double expected){
+		double result = calculateEuclideanDistance(vector1, vector2);
+
+		return (result == expected);
+	}
+
+	public static boolean getIndexOfMinValueInArray(double[] array, int expected){
+		int result = getIndexOfMinValueInArray(array);
+
+		return (result == expected);
+	}
+
+	//===================Matrix===================//
+
+	public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixAdd(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixMulti(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixDivConst(double[][] matrix1, int value, double[][] expected)
+	{
+
+		matrix1 = matrixMultiConst(matrix1, value);
+		return (matrixEquals(matrix1, expected));
+	}
+
+
+	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
+	{
+		matrix1 = matrixTranspose(matrix1);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	//===================Vectors===================//
+
+	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
+	{
+		vector1 = vectorAdd(vector1, vector2);
+		return (vectorEquals(vector1,expected));
+	}
+
+	public static boolean testScalarProduct(double[] vector1, double[] vector2, double expected)
+	{
+		double result = scalarProduct(vector1, vector2);
+
+		if(result == expected)
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testVectorDivConst(double[] vector, int value, double[] expected)
+	{
+		double[] result = vectorDivConst(vector, value);
+		return (vectorEquals(result, expected));
+	}
+
+	public static boolean testVectorMultConst(double[] vector1, int value, double[] expected)
+	{
+		double[] result = vectorMultConst(vector1, value);
+		return (vectorEquals(result,expected));
+	}
+
+	public static boolean testNormalizeVector(double[] vector, double[] expected){
+		double[] result = normalizeVector(vector);
+
+		return vectorEquals(vector, expected);
+	}
+
+	public static boolean testGetVectorNorm(double[] vector, double expected){
+		double result = getVectorNorm(vector);
+
+		return (result == expected);
+	}
+
+	public static boolean testVectorToMatrix(double[] vector, double[][] expected){
+		double[][] result = vectorToMatrix(vector);
+
+		return matrixEquals(result, expected);
+	}
+
+
+
 }
