@@ -1,7 +1,8 @@
-/*
+
 public class UnitTests {
     
-    	//===================Testes Unitarios===================//
+	//===================Unit tests===================//
+
 	public static boolean matrixEquals(double[][] matrix1, double[][] matrix2)
 	{
 		if(matrix1.length != matrix2.length)
@@ -33,124 +34,40 @@ public class UnitTests {
 		return (true);
 	}
 
-    public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
+	//=============General Operations=============//
+
+	public static boolean testIsSimetric(double[][] matrix, boolean expected)
 	{
-		matrix1 = matrixAdd(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
+		boolean result = isSimetric(matrix);
+
+		return (result == expected);
 	}
 
-	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
+	public static boolean testIsSquared(double[][] matrix, boolean expected)
 	{
-		matrix1 = matrixMult(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
+		boolean result = isSquared(matrix);
+
+		return result == expected;
 	}
 
-	public static boolean testMatrixDivConst(double[][] matrix1, double[][] expected, int value)
-	{
-
-		matrix1 = matrixMultConst(matrix1, value);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testMatrixMultiConst(double[][] matrix1, double[][] expected, int value)
-	{
-
-		matrix1 = matrixMultConst(matrix1, value);
-		return (matrixEquals(matrix1, expected));
-
-	}
-
-	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
-	{
-		matrix1 = matrixTranspose(matrix1);
-		return (matrixEquals(matrix1, expected));
-	}
-
-	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
-	{
-		vector1 = vectorAdd(vector1, vector2);
-		return (vectorEquals(vector1,expected));
-	}
-
-	public static boolean testVectorMulti(double[] vector1, double[] vector2, double expected)
-	{
-		double result = vectorMult(vector1, vector2);
+	public static boolean testIsValueInArray(int value, int array, boolean expected) {
 		
-		if(result == expected)
-			return true;
-		else
-			return false;
+		return (expected == isValueInArray(value, array));
+		
 	}
 
-	public static boolean testVectorDivConst(double[] vector1, double[] expected, int value)
+	public static boolean testGetCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int value, int[] expected)
 	{
-		double[] result = vectorMultConst(vector1, value);
-		return (vectorEquals(result,expected));
-	}
 
-	public static boolean testVectorMultiConst(double[] vector1, double[] expected, int value)
-	{
-		double[] result = vectorMultConst(vector1, 1);
-		return (vectorEquals(result,expected));
-	}
+		int[] result = getCoordinatesOfMinValuesOfDiagonalMatrix(matrix, value);
 
-	public static void testCSVtoMatrix(String filename)
-	{
-		double[][]	matrix;
-
-		matrix = CSVtoMatrix("test.csv");
-
-		printMatrix(matrix);
-	}
-
-	public static void testReadingCsv(String filename)
-	{
-		double[][] matrix = ReadingCsv("test.csv");
-
-		printMatrix(matrix);
-	}
-
-	public static void testReadingDir(String dirPath){
-
-		String[] csvFiles = ReadingDir("db");
-
-		for(String file : csvFiles){
-			System.out.printf("%s ", file);
-		}
-	}
-
-	public static void testTransformDoubleMatrixToRealMatrix(double[][] matrix)
-	{
-		RealMatrix result = transformDoubleMatrixToRealMatrix(matrix);
-
-		for(int i = 0; i < result.getRowDimension(); i++){
-			for(int j = 0; j < result.getColumnDimension(); j++){
-				System.out.printf("%.3f ", result.getEntry(i, j));
+		if(result.length == expected.length){
+			for(int i = 0; i < result.length; i++){
+				if(result[i] != expected[i])
+					return false;
 			}
-			System.out.println();
-		}
-	}
-
-	public static boolean testIsValueInArray() {
-		
-		int[] array = {1, 2, 3};
-
-		if(isValueInArray(2, array))
-			return true;
-		else	
+		}else{
 			return false;
-		
-	}
-
-	public static boolean testGetCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int NumberOfvalues, int[] expected)
-	{
-
-		int[] result = getCoordinatesOfMinValuesOfDiagonalMatrix(matrix, 2);
-
-		for(int i = 0; i < NumberOfvalues; i++){
-			if(result[i] != expected[i]){
-				return false;
-			}
 		}
 
 		return true;
@@ -169,5 +86,163 @@ public class UnitTests {
 		return matrixEquals(result, matrix);
 	}
 
+	public static boolean testAvgAbsolutError(double[][] matrix1, double[][] matrix2, double expected)
+	{
+		double result = avgAbsolutError(matrix1, matrix2);
+
+		if(result == expected)
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testCalculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues, double[][] expected)
+	{
+		double[][] result = calculateDecompressedMatrix(eigenVectors, eigenValues);
+
+		if(matrixEquals(result, expected))
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testCalculateMediumVector(double[][] allImgsInVector, double[] expected){
+		double[] result = CalculateMediumVector(allImgsInVector);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateAllPhis(double[][] allImagesMatrix, double[] mediumVector, double[][] expected){
+
+		double[][] result = calculateAllPhis(allImagesMatrix, mediumVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testBuildReverseCovarianceMatrix(double[][] allImagesMatrix, double[] mediumVector, double[][] expected){
+		double[][] result = buildReverseCovarianceMatrix(allImagesMatrix, mediumVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testGetEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allImagesMatrix, double[] mediumVector,int ownValues, double[][] expected){
+		double[][] result = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allImagesMatrix, mediumVector, ownValues);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean testBuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[] averageVector, double[][] allImagesInVector, double[][] expected){
+		double[][] result = BuildReconstructionMatrix(eigenVectors, eigenVectorLength, averageVector, allImagesInVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static double[][] testCalculateAllWeights(double[][] allPhis, double[][] eigenVectors, double[][] allImagesVector, double[][] expected){
+		double[][] result = calculateAllWeights(allPhis, eigenVectors, allImagesVector);
+
+		return matrixEquals(result, expected);
+	}
+
+	public static boolean TestCalculateWeights(double[][] eigenVectors, double[] phi, double[] expected){
+		double[] result = calculateWeights(eigenVectors, phi);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateNewPhi(double[] imageVector, double[] mediumVector, double[] expected){
+		double[] result = calculateNewPhi(imageVector, mediumVector);
+
+		return vectorEquals(result, expected);
+	}
+
+	public static boolean testCalculateEuclideanDistance(double[] vector1, double[] vector2, double expected){
+		double result = calculateEuclideanDistance(vector1, vector2);
+
+		return (result == expected);
+	}
+
+	public static boolean getIndexOfMinValueInArray(double[] array, int expected){
+		int result = getIndexOfMinValueInArray(array);
+
+		return (result == expected);
+	}
+
+
+	//===================Matrix===================//
+
+	public static boolean testMatrixAdd(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixAdd(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
+	{
+		matrix1 = matrixMult(matrix1, matrix2);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	public static boolean testMatrixDivConst(double[][] matrix1, int value, double[][] expected)
+	{
+
+		matrix1 = matrixMultConst(matrix1, value);
+		return (matrixEquals(matrix1, expected));
+	}
+
+
+	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
+	{
+		matrix1 = matrixTranspose(matrix1);
+		return (matrixEquals(matrix1, expected));
+	}
+
+	//===================Vectors===================//
+
+	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
+	{
+		vector1 = vectorAdd(vector1, vector2);
+		return (vectorEquals(vector1,expected));
+	}
+
+	public static boolean testScalarProduct(double[] vector1, double[] vector2, double expected)
+	{
+		double result = scalarProduct(vector1, vector2);
+		
+		if(result == expected)
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean testVectorDivConst(double[] vector, int value, double[] expected)
+	{
+		double[] result = vectorDivConst(vector, value);
+		return (vectorEquals(result, expected));
+	}
+
+	public static boolean testVectorMultConst(double[] vector1, int value, double[] expected)
+	{
+		double[] result = vectorMultConst(vector1, value);
+		return (vectorEquals(result,expected));
+	}
+
+	public static boolean testNormalizeVector(double[] vector, double[] expected){
+		double[] result = normalizeVector(vector);
+
+		return vectorEquals(vector, expected);
+	}
+
+	public static boolean testGetVectorNorm(double[] vector, double expected){
+		double result = getVectorNorm(vector);
+
+		return (result == expected);
+	}
+
+	public static boolean testVectorToMatrix(double[] vector, double[][] expected){
+		double[][] result = vectorToMatrix(vector);
+
+		return matrixEquals(result, expected);
+	}
+
 }
-*/
+
