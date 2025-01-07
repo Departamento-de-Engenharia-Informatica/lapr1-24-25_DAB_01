@@ -52,7 +52,7 @@ public class Main{
 
 		if (!arguments[0].equals("-f"))
 		{
-			outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+			outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
@@ -60,7 +60,7 @@ public class Main{
 			case FUNC_1:
 				if (!CheckingArgs(arguments, FUNC_1))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+					outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
 					return;
 				}
 
@@ -82,7 +82,7 @@ public class Main{
 			case FUNC_2:
 				if (!CheckingArgs(arguments, FUNC_2))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+					outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
 					return ;
 				}
 
@@ -105,7 +105,7 @@ public class Main{
             case FUNC_3:
 				if (!CheckingArgs(arguments, FUNC_3))
 				{
-					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+					outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
 					return ;
 				}
 
@@ -130,7 +130,7 @@ public class Main{
 
 				break;
 			default:
-				outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+				outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
         }
     }
 
@@ -193,25 +193,25 @@ public class Main{
 					matrix = CSVtoMatrix(path);
 					if(matrix == null)
 					{
-						outputFunction("Entrou um mal ficheiro .csv \n");
+						outputFunction("Entrou um ficheiro .csv incorreto\n");
 						return ;
 					}
 					doingFunctionOne(ownValues, matrix);
 					break;
 				case FUNC_2:
 					ownValues = OwnValues();
-					dirPath = GetPath("|Entre caminho para o diretório:|\n");
+					dirPath = GetPath("|Indique caminho para o diretório:|\n");
 					doingFunctionTwo(ownValues, dirPath);
 					break;
 				case FUNC_3:
 					ownValues = OwnValues();
-					path = GetPath("|Entre o caminho para o ficheiro:|\n");
-					dirPath = GetPath("|Entre caminho para o diretório:|\n");
+					path = GetPath("|Indique o caminho para o ficheiro:|\n");
+					dirPath = GetPath("|Indique caminho para o diretório:|\n");
 					SearchClosest(ownValues, path, dirPath);
 					break;
 				case FUNC_4:
 					ownValues = OwnValues();
-					dirPath = GetPath("|Entre caminho para o diretório que quer usar comobase para a geraç:|\n");
+					dirPath = GetPath("|Indique o caminho para o diretório que quer usar como base para a geração da imagem:|\n");
 					imageNumber = generateImage(ownValues, dirPath, imageNumber);
 					break;
 				default:
@@ -240,7 +240,7 @@ public class Main{
 		{
 			read = input.nextInt();
 			if (!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
-				outputFunction("Entrou um argumento errado. Tente novamente: \n");
+				outputFunction("Argumento errado encontrado. Tente novamente: \n");
 		}
 		return (read);
 	}
