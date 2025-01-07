@@ -217,7 +217,7 @@ public class Main{
 				default:
 			}
 		}
-		outputFunction("Program ending... Thanks for using it!!\n");
+		outputFunction("A fechar... Obrigado por usar o nosso programa!\n");
 	}
 
 	public static int TypeOfExecution()
