@@ -76,7 +76,7 @@ public class Main{
 					doingFunctionOne(ownValues, CSVtoMatrix(path));
 					outputFile.close();
 				}catch (IOException e) {
-					outputFunction("Not possible to write, closing program!");
+					outputFunction("Foi impossível escrever no ficheiro, a fechar o programa!");
 				}
 				break ;
 			case FUNC_2:
@@ -98,7 +98,7 @@ public class Main{
 					doingFunctionTwo(ownValues, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					outputFunction("Not possible to write, closing program!");
+					outputFunction("Foi impossível escrever no ficheiro, a fechar o programa!");
 				}
 
 				break;
@@ -122,7 +122,7 @@ public class Main{
 					SearchClosest(ownValues, path, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
-					outputFunction("Not possible to write, closing program!");
+					outputFunction("Foi impossível escrever no ficheiro, a fechar o programa!");
 				}
 
 				break ;
@@ -258,7 +258,7 @@ public class Main{
 			read = input.nextInt();
 			input.nextLine();
 			if(read <= 0 && read != MIN_OWN_VALUE)
-				outputFunction("Vocẽ precisa de entrar um número positivo ou <-1>. Tente novamente!\n");
+				outputFunction("É necessário introduzir um número positivo ou <-1>. Tente novamente!\n");
 		}
 		return read;
 	}
