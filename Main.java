@@ -22,6 +22,7 @@ public class Main{
 	public static final String PATH_WRITE_CSV = "Output/";
 	public static final String PATH_RECONSTRUCTION = "ImagensReconstruidas/";
 	public static final String PATH_EIGENFACES = "Eigenfaces/eigenfaces";
+	public static final int INITIAL_IMAGE_NUMBER = 0;
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -49,6 +50,7 @@ public class Main{
 		String			path;
 		String			dirPath;
 		String			pathWrite;
+		int				imageNumber;
 
 		if (!arguments[0].equals("-f"))
 		{
@@ -56,6 +58,7 @@ public class Main{
 			return ;
 		}
 		type = Integer.parseInt(arguments[1]);
+		imageNumber = INITIAL_IMAGE_NUMBER;
 		switch (type) {
 			case FUNC_1:
 				if (!CheckingArgs(arguments, FUNC_1))
@@ -127,8 +130,22 @@ public class Main{
 
 				break ;
 			case FUNC_4:
+				if (!CheckingArgs(arguments, FUNC_4))
+				{
+					outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
+					return ;
+				}
 
-				break;
+				ownValues = Integer.parseInt(arguments[3]);
+				if (!isOwnValueValid(ownValues)){
+					System.out.println("Valor próprio inválido (k), este tem que ser um número inteiro positivo ou -1");
+					return ;
+				}
+				dirPath = arguments[5];
+
+                generateImage(ownValues, dirPath, imageNumber);
+
+                break;
 			default:
 				outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
         }
@@ -165,6 +182,15 @@ public class Main{
 			if (arguments.length != 9)
 				return (false);
 		}
+		else if (whichExec == FUNC_4)
+		{
+			if(!(arguments[2].equals("-k")))
+				return (false);
+			if(!(arguments[4].equals("-d")))
+				return (false);
+			if (arguments.length != 6)
+				return (false);
+		}
 		return (true);
 	}
 
@@ -179,7 +205,7 @@ public class Main{
 
 		type = 1;
 		outputFile = null;
-		imageNumber = 0;
+		imageNumber = INITIAL_IMAGE_NUMBER;
 		while(type != 0)
 		{
 			type = TypeOfExecution();
@@ -1068,6 +1094,7 @@ public class Main{
 			normalizePixelIntensityOfMatrix(generatedImageMatrix);
 			matrixToJPG(generatedImageMatrix, String.format("Output/generatedImage%d.jpg", imageNumber));
 			imageNumber++;
+			outputFunction("Geração de imagem finalizada\n");
 		} catch (IOException e) {
 		}
 		return imageNumber;
