@@ -1,5 +1,4 @@
 
-import java.util.Arrays;
 import	java.util.Scanner;
 import java.io.*;
 
@@ -19,11 +18,10 @@ public class Main{
 	public static final int FUNC_4 = 4;
 	public static final int MAX_SIZE_IMG = 256;
 	public static final int MAX_VALUE_IN_CSV = 255;
-	public static final int MIN_VALUE_IN_CSV = 0;
 	public static final String PATH_WRITE_JPG = "Identificacao/";
 	public static final String PATH_WRITE_CSV = "Output/";
 	public static final String PATH_RECONSTRUCTION = "ImagensReconstruidas/";
-	public static final String PATH_EIGENFACES = "Eigenfaces/eigenfaces.csv";
+	public static final String PATH_EIGENFACES = "Eigenfaces/eigenfaces";
 
 	public static final int MIN_OWN_VALUE = -1;
 	public static final int MIN_TYPE_EXEC = 0;
@@ -127,6 +125,9 @@ public class Main{
 				}
 
 				break ;
+			case FUNC_4:
+
+				break;
 			default:
 				outputFunction("Entrou um argumento errado. Cheque e teste novamente!\n");
         }
@@ -173,9 +174,11 @@ public class Main{
 		int			ownValues;
 		String		path;
 		String		dirPath;
+		int			imageNumber;
 
 		type = 1;
 		outputFile = null;
+		imageNumber = 0;
 		while(type != 0)
 		{
 			type = TypeOfExecution();
@@ -204,9 +207,11 @@ public class Main{
 					path = GetPath("|Entre o caminho para o ficheiro:|\n");
 					dirPath = GetPath("|Entre caminho para o diretório:|\n");
 					SearchClosest(ownValues, path, dirPath);
-					break ;
+					break;
 				case FUNC_4:
-					unitTest();
+					ownValues = OwnValues();
+					dirPath = GetPath("|Entre caminho para o diretório que quer usar comobase para a geraç:|\n");
+					imageNumber = generateImage(ownValues, dirPath, imageNumber);
 					break;
 				default:
 			}
@@ -227,7 +232,7 @@ public class Main{
 		outputFunction("|(1) Decomposição de Imagens            |\n");
 		outputFunction("|(2) Reconstrução de imagens            |\n");
 		outputFunction("|(3) Identificar mais próximo           |\n");
-		outputFunction("|(4) Testes Unitários                   |\n");
+		outputFunction("|(4) Gerar Imagem                       |\n");
 		outputFunction("-----------------------------------------\n");
 
 		while(!(read <= MAX_TYPE_EXEC && read >= MIN_TYPE_EXEC))
@@ -244,9 +249,9 @@ public class Main{
 		int	read;
 
 		read = MIN_OWN_VALUE - 1;
-		outputFunction("---------------------------------------------------------------\n");
+		outputFunction("--------------------------------------------------------\n");
 		System.out.print("|Entre o número de valores próprios a serem utilizados:|\n");
-		outputFunction("---------------------------------------------------------------\n");
+		outputFunction("--------------------------------------------------------\n");
 		while (read == 0 || read < MIN_OWN_VALUE)
 		{
 			read = input.nextInt();
@@ -261,9 +266,9 @@ public class Main{
 	{
 		String	path;
 
-		outputFunction("-----------------------------------\n");
+		outputFunction("----------------------------------\n");
 		outputFunction(String.format("%s", searching));
-		outputFunction("-----------------------------------\n");
+		outputFunction("----------------------------------\n");
 		path = input.nextLine();
 		return (path);
 	}
@@ -282,208 +287,7 @@ public class Main{
 		}
 	}
 
-	//=============Testes Unitarios==============//
 
-	//=============Input Values=============//
-	public static final double[][] MAINMATRIX = {{2,0}, {0,3}};
-	public static final double[][] NONSQUAREMATRIX = {{4,5},{1}};
-	public static final double[][] SIMETRICMATRIX = {{3,5}, {5,3}};
-	public static final int ARBITRARYVALUE1 = 63;
-	public static final int ARBITRARYVALUE2 = 999;
-	public static final int[] VECTOR1 = {80,63,2};
-	public static final double[] VECTOR2 = {2,0,0,3};
-	public static final double[] VECTOR3 = {2,3};
-	public static final double[] VECTOR4 = {2,0,0,3};
-	public static final double[] VECTOR5 = {2,0,0,3};
-	public static final double[][] TESTALLIMAGES = {{5,6}, {10,12}};
-	public static final double[][] MATRIXOFEIGENVECTORS = {{5,9}, {1,4}};
-	public static final double[][] TESTALLPHIS = {{1,1}, {2,2}};
-	public static final double[][] REVERSECOVARIANCEMATRIX = {{2,4}, {15,8}};
-	public static final double SQUAREROOT13 = Math.sqrt(13);
-
-
-
-
-	//=============Expected Values=============//
-	public static final int[] expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1 = {0};
-	public static final int[] expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix2 = {0,1};
-	public static final double[][] expectedResultForTestGetEigenValuesSubMatrix = {{3}};
-	public static final double[][] expectedResultForTestGetEigenVectorsSubMatrix = {{9},{4}};
-	public static final double expectedResultForTestAvgAbsolutError = 0;
-	public static final double[][] expectedResultForTestCalculateDecompressedMatrix = {{293,118}, {118,50}};
-	public static final double[] expectedResultForTestCalculateMediumVector = {7.5, 9};
-	public static final double[][] expectedResultForTestCalculateAllPhis = {{-2.5,-3}, {2.5,3}};
-	public static final double[][] expectedResultForTestBuildReverseCovarianceMatrix= {{2,4}, {4,8}};
-	public static final double[][] expectedResultForTestGetEigenVectorsOfCovarianceMatrix = {{0.7071067811865475, 0.7071067811865475}, {-0.7071067811865476, -0.7071067811865476}};
-	public static final double[][] expectedResultForTestBuildReconstructionMatrix = {{82.5, 155.0}, {157.5, 301.0}};
-
-	public static final double[][] expectedResultForTestCalculateAllWeights = {{14.0, 5.0}, {28.0, 10.0}};
-	public static final double[] expectedResultForTestNormalizeVector = {2/SQUAREROOT13,0,0,3/SQUAREROOT13};
-	public static final double expectedResultForTestScalarProduct = 13;
-	public static final double[] expectedResultForTestVectorAdd = {4,0,0,6};
-	public static final double[][] expectedResultForTestMatrixMulti = {{4,0},{0,9}};
-	public static final double[] expectedResultForTestCalculateNewPhi = {-5.5,-6};
-	public static final double[] expectedResultForTestCalculateWeights = {-81.5, -29.5};
-	public static final double[][] MAINMATRIXTRANSPOSE = {{2,0}, {0,3}};
-
-
-	public static void unitTest()
-	{
-		System.out.println("==================================");
-		System.out.println("\t\tTeste Unitarios\t\t");
-		System.out.println("==================================");
-		System.out.println("1-testIsSimetric");
-			if (testIsSimetric(SIMETRICMATRIX, true))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-			if (testIsSimetric(MATRIXOFEIGENVECTORS, false)) //
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("2-testIsSquared");
-			if (testIsSquared(MAINMATRIX, true))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-			if (testIsSquared(NONSQUAREMATRIX, false)) //
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("3-testIsValueInArray");
-			if (testIsValueInArray(ARBITRARYVALUE1, VECTOR1, true))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-			if (testIsValueInArray(ARBITRARYVALUE2, VECTOR1, false)) //
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("4-testGetCoordinatesOfMinValuesOfDiagonalMatrix");
-			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix(MAINMATRIX, 1, expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-			if (testGetCoordinatesOfMinValuesOfDiagonalMatrix(MAINMATRIX, 2, expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix2)) //
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("5-testGetEigenValuesSubMatrix");
-			if (testGetEigenValuesSubMatrix(expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1, MAINMATRIX, expectedResultForTestGetEigenValuesSubMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("6-testGetEigenVectorsSubMatrix");
-			if (testGetEigenVectorsSubMatrix(expectedResultForTestGetCoordinatesOfMinValuesOfDiagonalMatrix1, MATRIXOFEIGENVECTORS, expectedResultForTestGetEigenVectorsSubMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("7-testAvgAbsolutError");
-			if (testAvgAbsolutError(MAINMATRIX, MAINMATRIX, expectedResultForTestAvgAbsolutError))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("8-testCalculateDecompressedMatrix");
-			if (testCalculateDecompressedMatrix(MATRIXOFEIGENVECTORS, MAINMATRIX, expectedResultForTestCalculateDecompressedMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("9-testCalculateMediumVector");
-			if (testCalculateMediumVector(TESTALLIMAGES, expectedResultForTestCalculateMediumVector))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("10-testCalculateAllPhis");
-			if (testCalculateAllPhis(TESTALLIMAGES, expectedResultForTestCalculateMediumVector, expectedResultForTestCalculateAllPhis))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("11-testBuildReverseCovarianceMatrix");
-			if (testBuildReverseCovarianceMatrix(TESTALLPHIS, expectedResultForTestBuildReverseCovarianceMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("12-testGetEigenVectorsOfCovarianceMatrix");
-			if (testGetEigenVectorsOfCovarianceMatrix(REVERSECOVARIANCEMATRIX, TESTALLPHIS, ARBITRARYVALUE1, expectedResultForTestGetEigenVectorsOfCovarianceMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("13-testBuildReconstructionMatrix");
-			if (testBuildReconstructionMatrix(MATRIXOFEIGENVECTORS, MATRIXOFEIGENVECTORS.length, TESTALLPHIS, calculateAllWeights(TESTALLPHIS, MATRIXOFEIGENVECTORS, TESTALLIMAGES), expectedResultForTestCalculateMediumVector, expectedResultForTestBuildReconstructionMatrix))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("14-testCalculateAllWeights");
-		if (testCalculateAllWeights(TESTALLPHIS, MATRIXOFEIGENVECTORS, TESTALLPHIS, expectedResultForTestCalculateAllWeights))
-			System.out.println("✅");
-		else
-			System.out.println("❌");
-		System.out.println("15-TestCalculateWeights");
-			if (testCalculateWeights(MATRIXOFEIGENVECTORS, expectedResultForTestCalculateNewPhi, expectedResultForTestCalculateWeights))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("16-testCalculateNewPhi");
-			if (testCalculateNewPhi(VECTOR3, expectedResultForTestCalculateMediumVector, expectedResultForTestCalculateNewPhi))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("17-testCalculateEuclideanDistance");
-			if (testCalculateEuclideanDistance(VECTOR2, VECTOR2, 0))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("18-getIndexOfMinValueInArray");
-			if (getIndexOfMinValueInArray(VECTOR2, 1))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("19-testMatrixMulti");
-			if (testMatrixMulti(MAINMATRIX, MAINMATRIX, expectedResultForTestMatrixMulti))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("20-testMatrixTranspose");
-			if (testMatrixTranspose(MAINMATRIX, MAINMATRIXTRANSPOSE))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("21-testVectorAdd");
-			if (testVectorAdd(VECTOR2, VECTOR2, expectedResultForTestVectorAdd))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("22-testScalarProduct");
-			if (testScalarProduct(VECTOR2, VECTOR2, expectedResultForTestScalarProduct))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("23-testVectorDivConst");
-			if (testVectorDivConst(VECTOR2, 1, VECTOR2))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("24-testVectorMultConst");
-			if (testVectorMultConst(VECTOR2, 1, VECTOR2))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("25-testNormalizeVector");
-			if (testNormalizeVector(VECTOR2, expectedResultForTestNormalizeVector))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("26-testGetVectorNorm");
-			if (testGetVectorNorm(VECTOR4, SQUAREROOT13))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-		System.out.println("27-testVectorToMatrix");
-		if (testVectorToMatrix(VECTOR5, MAINMATRIX))
-				System.out.println("✅");
-			else
-				System.out.println("❌");
-	}
 
 	//=========Matrix Read=========//
 	public static double[][] CSVtoMatrix(String filename)
@@ -630,7 +434,7 @@ public class Main{
 		return false;
 	}
 
-	public static int[] getCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int numberOfValues)
+	public static int[] getCoordsMinValuesOfDiagonalMatrix(double[][] matrix, int numberOfValues)
 	{
 		double 		minValue;
 		int 		coordinates;
@@ -721,7 +525,7 @@ public class Main{
 
 		if (own_values < totalNumberOfOwnValues && own_values != -1) {
 			numberValuesToRemove = totalNumberOfOwnValues - own_values;
-			arrayOfCoordinatesOfMinOwnValues = getCoordinatesOfMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
+			arrayOfCoordinatesOfMinOwnValues = getCoordsMinValuesOfDiagonalMatrix(eiganValues, numberValuesToRemove);
 
 			eigenVectorsSubMatrix = getEigenVectorsSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganVectors);
 			eigenValuesSubMatrix = getEigenValuesSubMatrix(arrayOfCoordinatesOfMinOwnValues, eiganValues);
@@ -824,6 +628,7 @@ public class Main{
         double[][]      reverseCovarianceMatrix;
         double[][]      eigenVectors;
         String[]        csvFilesInFolder;
+		double[]		allAverageAbsoulteError;
 
 
         csvFilesInFolder = ReadingDir(dirPath);
@@ -844,10 +649,18 @@ public class Main{
 
         reconstructionMatrix = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectors.length);
 
-		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors);
+
+		allAverageAbsoulteError = new double[reconstructionMatrix.length];
+
+		for (int i = 0; i < allAverageAbsoulteError.length; i++) {
+			allAverageAbsoulteError[i] = avgAbsolutError(vectorToMatrix(matrixInVector[i]), vectorToMatrix(reconstructionMatrix[i]));
+		}
+
+
+		outputFunctionTwo(averageVector, reverseCovarianceMatrix, allWeights, reconstructionMatrix, eigenVectors, allAverageAbsoulteError);
 	}
 
-	public static void outputFunctionTwo(double[] avgVector, double[][] reverseCovMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors){
+	public static void outputFunctionTwo(double[] avgVector, double[][] reverseCovMatrix, double[][] allWeights, double[][] reconstructionMatrix, double[][] eigenVectors,double[] allAverageAbsoluteError){
 
 		outputFunction("\n|======================================================|");
 		outputFunction("\n|              Saída da funcionalidade 2:              |");
@@ -864,14 +677,32 @@ public class Main{
 		outputFunction("Pesos Usados: \n");
 		printMatrix(allWeights);
 
-//		matrixToCSV(eigenVectors, PATH_EIGENFACES);
+		//Print da matriz "original" das eigenfaces que arredondas dá tudo zero
+		for (int k = 0; k < eigenVectors.length; k++) {
+			matrixToCSV(vectorToMatrix(eigenVectors[k]), String.format(PATH_EIGENFACES + "%d.csv", k));
+		}
 
-		for(int i = 0; i < reconstructionMatrix.length; i++){
-			try{
-				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.csv", i));
-				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION +"img%d.jpg", i));
-			}catch (IOException e){
+		//Colocar os valores das eiganfaces entre 0 e 255
+		normalizePixelIntensityOfMatrix(eigenVectors);
 
+		//Criar os ficheiros correspondentes
+		for (int j = 0; j < eigenVectors.length; j++) {
+			try {
+				matrixToCSV(vectorToMatrix(eigenVectors[j]), String.format(PATH_EIGENFACES + "%d_transformada.csv", j));
+				matrixToJPG(vectorToMatrix(eigenVectors[j]), String.format(PATH_EIGENFACES + "%d.jpg", j));
+			} catch (IOException e) {
+			}
+		}
+
+		outputFunction("Erro Absoluto Médio entre::\n");
+		//Criar os ficheiros das imagens reconstruidas
+		for(int i = 0; i < reconstructionMatrix.length; i++) {
+			try {
+				matrixToCSV(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION + "img%d.csv", i));
+				matrixToJPG(vectorToMatrix(reconstructionMatrix[i]), String.format(PATH_RECONSTRUCTION + "img%d.jpg", i));
+
+				outputFunction(String.format("img%d original e reconstruida = %.2f\n", i, allAverageAbsoluteError[i]));
+			} catch (IOException e) {
 			}
 		}
 	}
@@ -958,8 +789,6 @@ public class Main{
 		eigenVectorsOfCovarianceMatrix = matrixMulti(matrixTranspose(allPhis), eigenVectorsOfReverseCovarianceMatrix);
 
 		eigenVectorsOfCovarianceMatrix = matrixTranspose(eigenVectorsOfCovarianceMatrix);
-
-		matrixToCSV(eigenVectorsOfCovarianceMatrix, PATH_EIGENFACES);
 
 		for (int i = 0; i < eigenVectorsOfCovarianceMatrix.length; i++) {
 			eigenVectorsOfCovarianceMatrix[i] = normalizeVector(eigenVectorsOfCovarianceMatrix[i]);
@@ -1180,6 +1009,83 @@ public class Main{
 		return matrix;
 	}
 
+
+	//=========4=========//
+	public static int generateImage(int precisionValues, String dirPath, int imageNumber){
+
+		double[]		generatedImage;
+
+		double[]		averageVector;
+		double[][]		matrixInVector;
+		double[][]		allPhis;
+		double[][]      reverseCovarianceMatrix;
+		double[][]      eigenVectors;
+		double[][]		eigenValues;
+
+		String[]        csvFilesInFolder;
+
+
+
+
+		csvFilesInFolder = ReadingDir(dirPath);
+		if(AllImgsInVector(csvFilesInFolder) == null){
+			return -1;
+		}
+
+		matrixInVector = AllImgsInVector(csvFilesInFolder);
+
+		averageVector = CalculateMediumVector(matrixInVector);
+		allPhis = calculateAllPhis(matrixInVector, averageVector);
+
+		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
+
+		eigenVectors = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, precisionValues);
+		eigenValues = Decomposition(precisionValues, reverseCovarianceMatrix)[1];
+
+
+		generatedImage = new double[eigenVectors[0].length];
+
+
+		for (int j = 0; j < eigenVectors.length; j++) {
+			generatedImage = vectorAdd(vectorMultConst(eigenVectors[j], getRandomNumber(eigenValues[j][j])), generatedImage);
+		}
+		generatedImage = vectorAdd(generatedImage, averageVector);
+
+		imageNumber = outputFunctionFour(generatedImage, imageNumber);
+		return imageNumber;
+	}
+
+
+	public static int outputFunctionFour(double[] generatedImage, int imageNumber){
+
+		double[][]			generatedImageMatrix;
+
+		generatedImageMatrix = vectorToMatrix(generatedImage);
+
+		try {
+			matrixToCSV(generatedImageMatrix, String.format("Output/generatedImage%d.csv", imageNumber));
+			normalizePixelIntensityOfMatrix(generatedImageMatrix);
+			matrixToJPG(generatedImageMatrix, String.format("Output/generatedImage%d.jpg", imageNumber));
+			imageNumber++;
+		} catch (IOException e) {
+		}
+		return imageNumber;
+	}
+
+	public static double getRandomNumber(double lambda){
+
+		double			lowerRange;
+		double			upperRange;
+		double			randomNumber;
+
+		lowerRange = -1 * Math.sqrt(lambda);
+		upperRange = Math.sqrt(lambda);
+
+		randomNumber = (Math.random() * (upperRange - lowerRange)) + lowerRange;
+
+		return randomNumber;
+	}
+
 	//=============Matrix Operations=============//
 	public static double[][] matrixMulti(double[][] matrix1, double[][] matrix2)
 	{
@@ -1384,15 +1290,12 @@ public class Main{
 
 		image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
 
+		normalizePixelIntensityOfMatrix(matrix);
+
 		// Set the pixel intensities
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				int intensity = (int) Math.round(matrix[y][x]);
-				if (intensity < MIN_VALUE_IN_CSV ) {
-					intensity = 0;
-				}else if (intensity > MAX_VALUE_IN_CSV){
-					intensity = 255;
-				}
 				int rgb = (intensity << 16) | (intensity << 8) | intensity; // Set the same value for R, G, B
 				image.setRGB(x, y, rgb);
 			}
@@ -1402,6 +1305,55 @@ public class Main{
 		File outputFile = new File(outputFilePath);
 		ImageIO.write(image, "jpg", outputFile);
 	}
+
+    public static void normalizePixelIntensityOfMatrix(double[][] matrix){
+        double minEigenface;
+        double maxEigenface;
+        double amplitude;
+
+
+        minEigenface = getMinValueOfMatrix(matrix);
+        maxEigenface = getMaxValueOfMatrix(matrix);
+        amplitude = maxEigenface - minEigenface;
+
+
+
+        for (int vetor = 0; vetor < matrix.length; vetor++) {
+            for (int value = 0; value < matrix[0].length; value++) {
+                matrix[vetor][value] = MAX_VALUE_IN_CSV * ((matrix[vetor][value] - minEigenface) / amplitude);
+            }
+        }
+    }
+
+    public static double getMinValueOfMatrix(double[][] matrix){
+
+        double minValue;
+        minValue = matrix[0][0];
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] < minValue){
+                    minValue = matrix[i][j];
+                }
+            }
+        }
+        return minValue;
+    }
+    public static double getMaxValueOfMatrix(double[][] matrix){
+
+        double maxValue;
+        maxValue = matrix[0][0];
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (matrix[i][j] > maxValue){
+                    maxValue = matrix[i][j];
+                }
+            }
+        }
+        return maxValue;
+    }
+
 
 	//===================Status Verifier===================//
 	public static boolean isSimetric(double[][] matrix){
@@ -1468,195 +1420,5 @@ public class Main{
         return false;
     }
 
-	//===================Unit tests===================//
-	//=============General Operations=============//
-
-	public static boolean testIsSimetric(double[][] matrix, boolean expected)
-	{
-		boolean result = isSimetric(matrix);
-
-		return (result == expected);
-	}
-
-	public static boolean testIsSquared(double[][] matrix, boolean expected)
-	{
-		boolean result = isSquared(matrix);
-
-		return (result == expected);
-	}
-
-	public static boolean testIsValueInArray(double value, int[] array, boolean expected) {
-
-		return (expected == isValueInArray(value, array));
-
-	}
-
-	public static boolean testGetCoordinatesOfMinValuesOfDiagonalMatrix(double[][] matrix, int value, int[] expected)
-	{
-
-		int[] result = getCoordinatesOfMinValuesOfDiagonalMatrix(matrix, value);
-
-		if(result.length == expected.length){
-			for(int i = 0; i < result.length; i++){
-				if(result[i] != expected[i])
-					return false;
-			}
-		}else{
-			return false;
-		}
-
-		return true;
-	}
-
-	public static boolean testGetEigenValuesSubMatrix(int[] arrayOfCoordinates, double[][] matrix, double[][] expected)
-	{
-		double[][] result = getEigenValuesSubMatrix(arrayOfCoordinates, matrix);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean  testGetEigenVectorsSubMatrix(int[] arrayOfCoordinates, double[][] matrix, double[][] expected){
-		double[][] result = getEigenVectorsSubMatrix(arrayOfCoordinates, matrix);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testAvgAbsolutError(double[][] matrix1, double[][] matrix2, double expected)
-	{
-		double result = avgAbsolutError(matrix1, matrix2);
-
-		if(result == expected)
-			return true;
-		else
-			return false;
-	}
-
-	public static boolean testCalculateDecompressedMatrix(double[][] eigenVectors, double[][] eigenValues, double[][] expected)
-	{
-		double[][] result = calculateDecompressedMatrix(eigenVectors, eigenValues);
-
-        return matrixEquals(result, expected);
-	}
-
-	public static boolean testCalculateMediumVector(double[][] allImgsInVector, double[] expected){
-		double[] result = CalculateMediumVector(allImgsInVector);
-
-		return vectorEquals(result, expected);
-	}
-
-	public static boolean testCalculateAllPhis(double[][] allImagesMatrix, double[] mediumVector, double[][] expected){
-
-		double[][] result = calculateAllPhis(allImagesMatrix, mediumVector);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testBuildReverseCovarianceMatrix(double[][] allPhis, double[][] expected){
-		double[][] result = buildReverseCovarianceMatrix(allPhis);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testGetEigenVectorsOfCovarianceMatrix(double[][] reverseCovarianceMatrix,double[][] allPhis, int ownValues, double[][] expected){
-		double[][] result = getEigenVectorsOfCovarianceMatrix(reverseCovarianceMatrix, allPhis, ownValues);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testBuildReconstructionMatrix(double[][] eigenVectors, int eigenVectorLength, double[][] allPhis, double[][] allWeights, double[]averageVector, double[][] expected){
-		double[][] result = BuildReconstructionMatrix(eigenVectors, allPhis, allWeights, averageVector, eigenVectorLength);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testCalculateAllWeights(double[][] allPhis, double[][] eigenVectors, double[][] allImagesVector, double[][] expected){
-		double[][] result = calculateAllWeights(allPhis, eigenVectors, allImagesVector);
-
-		return matrixEquals(result, expected);
-	}
-
-	public static boolean testCalculateWeights(double[][] eigenVectors, double[] phi, double[] expected){
-		double[] result = calculateWeights(eigenVectors, phi);
-
-		return vectorEquals(result, expected);
-	}
-
-	public static boolean testCalculateNewPhi(double[] imageVector, double[] mediumVector, double[] expected){
-		double[] result = calculateNewPhi(imageVector, mediumVector);
-
-		return vectorEquals(result, expected);
-	}
-
-	public static boolean testCalculateEuclideanDistance(double[] vector1, double[] vector2, double expected){
-		double result = calculateEuclideanDistance(vector1, vector2);
-
-		return (result == expected);
-	}
-
-	public static boolean getIndexOfMinValueInArray(double[] array, int expected){
-		int result = getIndexOfMinValueInArray(array);
-
-		return (result == expected);
-	}
-
-	//===================Matrix===================//
-
-	public static boolean testMatrixMulti(double[][] matrix1, double[][] matrix2, double[][] expected)
-	{
-		matrix1 = matrixMulti(matrix1, matrix2);
-		return (matrixEquals(matrix1, expected));
-	}
-
-
-	public static boolean testMatrixTranspose(double[][] matrix1,  double[][] expected)
-	{
-		double[][] matrix2 = matrixTranspose(matrix1);
-		return (matrixEquals(matrix2, expected));
-	}
-
-	//===================Vectors===================//
-
-	public static boolean testVectorAdd(double[] vector1, double[] vector2, double[] expected)
-	{
-		vector1 = vectorAdd(vector1, vector2);
-		return (vectorEquals(vector1,expected));
-	}
-
-	public static boolean testScalarProduct(double[] vector1, double[] vector2, double expected)
-	{
-		double result = scalarProduct(vector1, vector2);
-
-        return result == expected;
-	}
-
-	public static boolean testVectorDivConst(double[] vector, int value, double[] expected)
-	{
-		double[] result = vectorDivConst(vector, value);
-		return (vectorEquals(result, expected));
-	}
-
-	public static boolean testVectorMultConst(double[] vector1, int value, double[] expected)
-	{
-		double[] result = vectorMultConst(vector1, value);
-		return (vectorEquals(result,expected));
-	}
-
-	public static boolean testNormalizeVector(double[] vector, double[] expected){
-		double[] result = normalizeVector(vector);
-
-		return vectorEquals(result, expected);
-	}
-
-	public static boolean testGetVectorNorm(double[] vector, double expected){
-		double result = getVectorNorm(vector);
-
-		return (result == expected);
-	}
-
-	public static boolean testVectorToMatrix(double[] vector, double[][] expected){
-		double[][] result = vectorToMatrix(vector);
-
-		return matrixEquals(result, expected);
-	}
 
 }
