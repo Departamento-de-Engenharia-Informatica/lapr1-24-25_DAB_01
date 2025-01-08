@@ -52,7 +52,29 @@ public class Main{
 		String			pathWrite;
 		int				imageNumber;
 
-		if (!arguments[0].equals("-f"))
+		if (arguments[0].equals("-h"))
+		{
+			outputFunction(
+					"\033[31m" + "\nUsar programa desta forma: java -jar nome programa.jar -f X -k Y -i Z -d W saida.txt:\n\n" +
+					"- o valor associado ao parâmetro f identifica a funcionalidade a executar. X toma os\n" +
+					"valores 1, 2 ou 3, representando, respetivamente, as funcionalidades de decomposição\n" +
+					"própria de matriz, a reconstrução de imagens utilizando eigenfaces e a identificação\n" +
+					"de imagens utilizando pesos das eigenfaces.\n\n" +
+					"- o valor associado ao parâmetro k identifica o número de vetores próprios / eigenfaces\n" +
+					"a utilizar na decomposição/reconstrução/identicação. Y toma valores inteiros\n" +
+					"positivos e -1. Caso o valor de Y seja -1 ou um valor superior ao número de valores\n" +
+					"próprios reais existentes, na decomposição/reconstrução/identicação devem ser\n" +
+					"utilizados todos os valores próprios reais da matriz.\n\n" +
+					"- o valor associado ao parâmetro i identifica a localização do ficheiro CSV onde está\n" +
+					"localizada a matriz/imagem de input a utilizar nas funcionalidade 1 e 3. Para\n" +
+					"executar a funcionalidade 2 não é necessário especificar este parâmetro.\n\n" +
+					"- o valor associado ao parâmetro d identifica a localização da base de imagens a\n" +
+					"utilizar nas funcionalidade 2 e 3. Para executar a funcionalidade 1 não é necessário\n" +
+					"especificar este parâmetro.\n\n" +
+							"Em caso de dúvidas, use o método interativo!\n\n" + "\033[0m");
+			return ;
+		}
+		else if (!arguments[0].equals("-f"))
 		{
 			outputFunction("Foi introduzido um argumento errado. Verique e teste novamente!\n");
 			return ;
@@ -685,7 +707,7 @@ public class Main{
 
         matrixInVector = AllImgsInVector(csvFilesInFolder);
 
-        averageVector = CalculateMediumVector(matrixInVector);
+        averageVector = CalculateAverageVector(matrixInVector);
 		allPhis = calculateAllPhis(matrixInVector, averageVector);
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
@@ -779,7 +801,7 @@ public class Main{
     }
 
 
-	public static double[] CalculateMediumVector(double[][] allImgsInVector)
+	public static double[] CalculateAverageVector(double[][] allImgsInVector)
 	{
 		double[]	mediumVector;
 		int			vectorItens;
@@ -977,7 +999,7 @@ public class Main{
 	{
         String[] 		files;
         double[][] 		allImagesVector;
-		double[] 		mediumVector;
+		double[] 		averageVector;
 
 		double[] 		newPhi;
 		double[][]		imageMatrix;
@@ -999,7 +1021,7 @@ public class Main{
 		if(allImagesVector == null){
 			return ;
 		}
-		mediumVector = CalculateMediumVector(allImagesVector);
+		averageVector = CalculateAverageVector(allImagesVector);
 
 		imageMatrix = CSVtoMatrix(csvPath);
 		if (!validMatrix(imageMatrix))
@@ -1007,13 +1029,13 @@ public class Main{
 
 		imageVector = MatrixToVerticalVector(imageMatrix);
 
-		newPhi = calculateNewPhi(imageVector, mediumVector);
+		newPhi = calculateNewPhi(imageVector, averageVector);
 		if(newPhi == null)
 		{
 			return ;
 		}
 
-		allPhis = calculateAllPhis(allImagesVector, mediumVector);
+		allPhis = calculateAllPhis(allImagesVector, averageVector);
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
 
@@ -1022,13 +1044,10 @@ public class Main{
 		newWeights = calculateWeights(eigenVectors, newPhi);
 
 
-		allWeights = new double[allImagesVector.length][allImagesVector[0].length];
+		allWeights = calculateAllWeights(allPhis,eigenVectors, allImagesVector);
 
 		allEuclideanDistances = new double[allWeights.length];
 
-		for (int i = 0; i < allImagesVector.length; i++) {
-			allWeights[i] = calculateWeights(eigenVectors,allPhis[i]);
-		}
 
 		for (int i = 0; i < allEuclideanDistances.length; i++) {
 			allEuclideanDistances[i] = calculateEuclideanDistance(newWeights, allWeights[i]);
@@ -1081,7 +1100,7 @@ public class Main{
 
 		matrixInVector = AllImgsInVector(csvFilesInFolder);
 
-		averageVector = CalculateMediumVector(matrixInVector);
+		averageVector = CalculateAverageVector(matrixInVector);
 		allPhis = calculateAllPhis(matrixInVector, averageVector);
 
 		reverseCovarianceMatrix = buildReverseCovarianceMatrix(allPhis);
@@ -1156,21 +1175,6 @@ public class Main{
 			}
 		}
 		return (matrixResult);
-	}
-
-	public static double[][] matrixMultiConst(double[][] matrix1, int value)
-	{
-		int			martixLen;
-		int			matrixHeight;
-
-		martixLen = matrix1[0].length;
-		matrixHeight = matrix1.length;
-
-
-		for (int i = 0; i < matrixHeight; i++)
-			for (int j = 0; j < martixLen; j++)
-				matrix1[i][j] = matrix1[i][j] * value;
-		return (matrix1);
 	}
 
 	public static double[][] matrixTranspose(double[][] matrix)
@@ -1387,6 +1391,7 @@ public class Main{
         }
         return minValue;
     }
+
     public static double getMaxValueOfMatrix(double[][] matrix){
 
         double maxValue;
@@ -1434,19 +1439,6 @@ public class Main{
 				if(matrix1[i][k] != matrix2[i][k])
 					return (false);
 			}
-		}
-		return (true);
-	}
-
-	public static boolean vectorEquals(double[] vector1, double[] vector2)
-	{
-		if(vector1.length != vector2.length)
-			return (false);
-
-		for (int i = 0; i < vector1.length; i++)
-		{
-			if(vector1[i] != vector2[i])
-				return (false);
 		}
 		return (true);
 	}
