@@ -76,6 +76,7 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					printProgramName();
 					doingFunctionOne(ownValues, CSVtoMatrix(path));
 					outputFile.close();
 				}catch (IOException e) {
@@ -98,6 +99,7 @@ public class Main{
 				pathWrite = arguments[6];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					printProgramName();
 					doingFunctionTwo(ownValues, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
@@ -122,6 +124,7 @@ public class Main{
 				pathWrite = arguments[8];
 				try{
 					outputFile = new BufferedWriter(new FileWriter(pathWrite));
+					printProgramName();
 					SearchClosest(ownValues, path, dirPath);
 					outputFile.close();
 				} catch (IOException e) {
@@ -195,6 +198,22 @@ public class Main{
 	}
 
 	//============Iterative exec and reading=============//
+	public static void printProgramName()
+	{
+		outputFunction("\u001B[32m" +
+				"===================================================\n" +
+				" _____ _                  _____ _               _   \n" +
+				"|  ___(_)                |  __ \\ |             | |  \n" +
+				"| |__  _  __ _  ___ _ __ | |  \\/ |__   ___  ___| |_ \n" +
+				"|  __|| |/ _` |/ _ \\ '_ \\| | __| '_ \\ / _ \\/ __| __|\n" +
+				"| |___| | (_| |  __/ | | | |_\\ \\ | | | (_) \\__ \\ |_ \n" +
+				"\\____/|_|\\__, |\\___|_| |_|\\____/_| |_|\\___/|___/\\__|\n" +
+				"          __/ |                                     \n" +
+				"         |___/                                      \n" +
+				"====================================================\n" +
+				"\u001B[0m");
+	}
+
 	public static void interactive()
 	{
 		int			type;
@@ -203,6 +222,7 @@ public class Main{
 		String		dirPath;
 		int			imageNumber;
 
+		printProgramName();
 		type = 1;
 		outputFile = null;
 		imageNumber = INITIAL_IMAGE_NUMBER;
@@ -237,7 +257,7 @@ public class Main{
 					break;
 				case FUNC_4:
 					ownValues = OwnValues();
-					dirPath = GetPath("|Indique o caminho para o diretório que quer usar como base para a geração da imagem:|\n");
+					dirPath = GetPath("|Indique caminho para o diretório:|\n");
 					imageNumber = generateImage(ownValues, dirPath, imageNumber);
 					break;
 				default:
@@ -252,7 +272,7 @@ public class Main{
 
 		read = 100;
 		outputFunction("-----------------------------------------\n");
-		outputFunction("|            Menu of execution          |\n");
+		outputFunction("|            Menu de Execução           |\n");
 		outputFunction("-----------------------------------------\n");
 		outputFunction("|Entre Tipo de Execução:                |\n");
 		outputFunction("|(0) Sair do Programa                   |\n");
@@ -293,9 +313,9 @@ public class Main{
 	{
 		String	path;
 
-		outputFunction("----------------------------------\n");
+		outputFunction("-----------------------------------\n");
 		outputFunction(String.format("%s", searching));
-		outputFunction("----------------------------------\n");
+		outputFunction("-----------------------------------\n");
 		path = input.nextLine();
 		return (path);
 	}
