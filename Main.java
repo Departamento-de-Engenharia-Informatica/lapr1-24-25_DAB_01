@@ -155,40 +155,40 @@ public class Main{
 	{
 		if (whichExec == FUNC_1)
 		{
+			if (arguments.length != 7)
+				return (false);
 			if(!(arguments[2].equals("-k")))
 				return (false);
 			if(!(arguments[4].equals("-i")))
 				return (false);
-			if (arguments.length != 7)
-				return (false);
 		}
 		else if (whichExec == FUNC_2)
 		{
+			if (arguments.length != 7)
+				return (false);
 			if(!(arguments[2].equals("-k")))
 				return (false);
 			if(!(arguments[4].equals("-d")))
 				return (false);
-			if (arguments.length != 7)
-				return (false);
 		}
 		else if (whichExec == FUNC_3)
 		{
+			if (arguments.length != 9)
+				return (false);
 			if(!(arguments[2].equals("-k")))
 				return (false);
 			if(!(arguments[4].equals("-i")))
 				return (false);
 			if(!(arguments[6].equals("-d")))
 				return (false);
-			if (arguments.length != 9)
-				return (false);
 		}
 		else if (whichExec == FUNC_4)
 		{
+			if (arguments.length != 6)
+				return (false);
 			if(!(arguments[2].equals("-k")))
 				return (false);
 			if(!(arguments[4].equals("-d")))
-				return (false);
-			if (arguments.length != 6)
 				return (false);
 		}
 		return (true);
