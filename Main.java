@@ -644,6 +644,10 @@ public class Main{
 
 	public static void printDecomposition(double[][][] ownVs, double[][] decompressedMatrix, int ownValues, double[][] matrix)
 	{
+		outputFunction("\n|======================================================|");
+		outputFunction("\n|              Saída da funcionalidade 1:              |");
+		outputFunction("\n|======================================================|\n");
+
 		outputFunction(String.format("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length));
 
 		outputFunction("\nMatriz de vetores próprios::\n");
