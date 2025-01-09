@@ -61,7 +61,7 @@ public class Main{
 					"própria de matriz, a reconstrução de imagens utilizando eigenfaces e a identificação\n" +
 					"de imagens utilizando pesos das eigenfaces.\n\n" +
 					"- o valor associado ao parâmetro k identifica o número de vetores próprios / eigenfaces\n" +
-					"a utilizar na decomposição/reconstrução/identicação. Y toma valores inteiros\n" +
+					"a utilizar na decomposição/reconstrução/identificação. Y toma valores inteiros\n" +
 					"positivos e -1. Caso o valor de Y seja -1 ou um valor superior ao número de valores\n" +
 					"próprios reais existentes, na decomposição/reconstrução/identicação devem ser\n" +
 					"utilizados todos os valores próprios reais da matriz.\n\n" +
@@ -1227,18 +1227,15 @@ public class Main{
 
 	public static double[] vectorAdd(double[] vector1, double[] vector2)
 	{
-		int		 vectorLen;
-
 		double[] addedVector;
 
-		vectorLen = vector1.length;
-		addedVector = new double[vectorLen];
+		addedVector = new double[vector1.length];
 
 		if(vector1.length != vector2.length){
 			return null;
 		}
 
-		for (int i = 0; i < vectorLen; i++)
+		for (int i = 0; i < vector1.length; i++)
 			addedVector[i] = vector1[i] + vector2[i];
 		return (addedVector);
 	}
@@ -1257,22 +1254,17 @@ public class Main{
 
 	public static double[] vectorDivConst(double[] vector1, double value)
 	{
-		int			vectorLen;
-
-		vectorLen = vector1.length;
-		for (int i = 0; i < vectorLen; i++)
+		for (int i = 0; i < vector1.length; i++)
 			vector1[i] = vector1[i] / value;
 		return (vector1);
 	}
 
 	public static double[] vectorMultConst(double[] vector1, double value)
 	{
-		int			vectorLen;
 		double[]	multipliedVector;
 
-		vectorLen = vector1.length;
-		multipliedVector = new double[vectorLen];
-		for (int i = 0; i < vectorLen; i++)
+		multipliedVector = new double[vector1.length];
+		for (int i = 0; i < vector1.length; i++)
 			multipliedVector[i] = vector1[i] * value;
 		return (multipliedVector);
 	}
