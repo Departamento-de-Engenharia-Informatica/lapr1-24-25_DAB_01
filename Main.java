@@ -57,19 +57,19 @@ public class Main{
 			outputFunction(
 					"\033[31m" + "\nUsar programa desta forma: java -jar nome programa.jar -f X -k Y -i Z -d W saida.txt:\n\n" +
 					"- o valor associado ao parâmetro f identifica a funcionalidade a executar. X toma os\n" +
-					"valores 1, 2 ou 3, representando, respetivamente, as funcionalidades de decomposição\n" +
-					"própria de matriz, a reconstrução de imagens utilizando eigenfaces e a identificação\n" +
-					"de imagens utilizando pesos das eigenfaces.\n\n" +
+					"valores 1, 2, 3, ou 4 representando, respetivamente, as funcionalidades de decomposição\n" +
+					"própria de matriz, a reconstrução de imagens utilizando eigenfaces, a identificação\n" +
+					"de imagens utilizando pesos das eigenfaces e gerar uma imagem.\n\n" +
 					"- o valor associado ao parâmetro k identifica o número de vetores próprios / eigenfaces\n" +
 					"a utilizar na decomposição/reconstrução/identificação. Y toma valores inteiros\n" +
 					"positivos e -1. Caso o valor de Y seja -1 ou um valor superior ao número de valores\n" +
-					"próprios reais existentes, na decomposição/reconstrução/identicação devem ser\n" +
+					"próprios reais existentes, na decomposição/reconstrução/identicação/geração devem ser\n" +
 					"utilizados todos os valores próprios reais da matriz.\n\n" +
 					"- o valor associado ao parâmetro i identifica a localização do ficheiro CSV onde está\n" +
 					"localizada a matriz/imagem de input a utilizar nas funcionalidade 1 e 3. Para\n" +
-					"executar a funcionalidade 2 não é necessário especificar este parâmetro.\n\n" +
+					"executar a funcionalidade 2 e 4 não é necessário especificar este parâmetro.\n\n" +
 					"- o valor associado ao parâmetro d identifica a localização da base de imagens a\n" +
-					"utilizar nas funcionalidade 2 e 3. Para executar a funcionalidade 1 não é necessário\n" +
+					"utilizar nas funcionalidade 2, 3 e 4. Para executar a funcionalidade 1 não é necessário\n" +
 					"especificar este parâmetro.\n\n" +
 							"Em caso de dúvidas, use o método interativo!\n\n" + "\033[0m");
 			return ;
