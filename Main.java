@@ -28,6 +28,9 @@ public class Main{
 	public static final int MIN_TYPE_EXEC = 0;
 	public static final int MAX_TYPE_EXEC = 4;
 
+    public static final boolean PRINTDECIMAL = true;
+    public static final boolean PRINTINT = false;
+
 	public static final Scanner input = new Scanner(System.in);
 
 
@@ -63,7 +66,7 @@ public class Main{
 					"- o valor associado ao parâmetro k identifica o número de vetores próprios / eigenfaces\n" +
 					"a utilizar na decomposição/reconstrução/identificação. Y toma valores inteiros\n" +
 					"positivos e -1. Caso o valor de Y seja -1 ou um valor superior ao número de valores\n" +
-					"próprios reais existentes, na decomposição/reconstrução/identicação/geração devem ser\n" +
+					"próprios reais existentes, na decomposição/reconstrução/identificação/geração devem ser\n" +
 					"utilizados todos os valores próprios reais da matriz.\n\n" +
 					"- o valor associado ao parâmetro i identifica a localização do ficheiro CSV onde está\n" +
 					"localizada a matriz/imagem de input a utilizar nas funcionalidade 1 e 3. Para\n" +
@@ -651,10 +654,10 @@ public class Main{
 		outputFunction(String.format("//Foram calculados %d valores e vetores próprios//\n", ownVs[1].length));
 
 		outputFunction("\nMatriz de vetores próprios::\n");
-		printMatrix(ownVs[0]);
+		printMatrix(ownVs[0], PRINTDECIMAL);
 
 		outputFunction("Matriz de valores próprios::\n");
-		printMatrix(ownVs[1]);
+		printMatrix(ownVs[1], PRINTDECIMAL);
 
 		outputFunction("Matriz resultante da multiplicação das matrizes decompostas::\n");
 
@@ -662,7 +665,7 @@ public class Main{
 			for (int j = 0; j < decompressedMatrix[0].length; j++)
 				decompressedMatrix[i][j] = Math.round(decompressedMatrix[i][j]);
 
-		printMatrix(decompressedMatrix);
+		printMatrix(decompressedMatrix, PRINTINT);
 
 		if (ownVs[0][0].length == decompressedMatrix.length || ownValues == -1) {
 			outputFunction("O Erro Absoluto Médio é :: 0\n");
@@ -745,10 +748,10 @@ public class Main{
 		printVector(avgVector);
 
 		outputFunction("\nMatriz de Covariância\n");
-		printMatrix(reverseCovMatrix);
+		printMatrix(reverseCovMatrix, PRINTINT);
 
 		outputFunction("Pesos Usados: \n");
-		printMatrix(allWeights);
+		printMatrix(allWeights, PRINTINT);
 
 		//Print da matriz "original" das eigenfaces que arredondas dá tudo zero
 		for (int k = 0; k < eigenVectors.length; k++) {
@@ -1270,18 +1273,23 @@ public class Main{
 	}
 
 	//=============Display Matrix=============//
-	public static void printMatrix(double[][] matrix)
+	public static void printMatrix(double[][] matrix, boolean isDecimal)
 	{
 		for (int rows = 0; rows < matrix.length; rows++) {
 			for (int columns = 0; columns < matrix[0].length; columns++)
 			{
-				outputFunction(String.format("%.0f ", matrix[rows][columns]));
+                if (isDecimal){
+                    outputFunction(String.format("%.2f ", matrix[rows][columns]));
+                }else {
+				    outputFunction(String.format("%.0f ", matrix[rows][columns]));
+                }
             }
 			outputFunction("\n");
 
 		}
 		outputFunction("\n");
 	}
+
 
 	public static void printVector(double[] vector)
 	{
